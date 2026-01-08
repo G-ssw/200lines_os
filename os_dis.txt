@@ -1,0 +1,341 @@
+
+os.elf:     file format elf32-i386
+os.elf
+architecture: i386, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x00007c00
+
+Program Header:
+    LOAD off    0x00000000 vaddr 0x00007000 paddr 0x00007000 align 2**12
+         filesz 0x00000fe8 memsz 0x00000fe8 flags r-x
+    LOAD off    0x00001000 vaddr 0x00009000 paddr 0x00009000 align 2**12
+         filesz 0x00004000 memsz 0x00004000 flags rw-
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000038d  00007c00  00007c00  00000c00  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .eh_frame     00000058  00007f90  00007f90  00000f90  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .data         00004000  00009000  00009000  00001000  2**12
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .comment      00000011  00000000  00000000  00005000  2**0
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000040  00000000  00000000  00005018  2**3
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000223  00000000  00000000  00005058  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 0000011b  00000000  00000000  0000527b  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000000c6  00000000  00000000  00005396  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_str    00000156  00000000  00000000  0000545c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+SYMBOL TABLE:
+00007c00 l    d  .text	00000000 .text
+00007f90 l    d  .eh_frame	00000000 .eh_frame
+00009000 l    d  .data	00000000 .data
+00000000 l    d  .comment	00000000 .comment
+00000000 l    d  .debug_aranges	00000000 .debug_aranges
+00000000 l    d  .debug_info	00000000 .debug_info
+00000000 l    d  .debug_abbrev	00000000 .debug_abbrev
+00000000 l    d  .debug_line	00000000 .debug_line
+00000000 l    d  .debug_str	00000000 .debug_str
+00000000 l    df *ABS*	00000000 start.o
+00007c13 l       .text	00000000 read_self_all
+00007e00 l       .text	00000000 start_32
+00007e40 l       .text	00000000 gdt_desc
+00007e46 l       .text	00000000 idt_desc
+00000000 l    df *ABS*	00000000 os.c
+0000a000 l     O .data	00001000 pg_table
+0000c800 g     O .data	00000800 gdt_table
+00009000 g     O .data	00001000 map_phy_buffer
+00007e6b g     F .text	00000122 os_init
+00007c00 g       .text	00000000 _start
+00007e4c g     F .text	0000001f outb
+0000d000 g       .data	00000000 __bss_start
+0000b000 g     O .data	00001000 pg_dir
+0000d000 g       .data	00000000 _edata
+0000d000 g       .data	00000000 _end
+0000c000 g     O .data	00000800 idt_table
+00007e37 g       .text	00000000 irq0_handler
+
+
+
+Disassembly of section .text:
+
+00007c00 <_start>:
+  	.code16
+
+	// 以下是代码区
+ 	.text
+_start: 
+	mov $0, %ax
+    7c00:	b8 00 00 8e d8       	mov    $0xd88e0000,%eax
+	mov %ax, %ds
+	mov %ax, %es
+    7c05:	8e c0                	mov    %eax,%es
+	mov %ax, %ss
+    7c07:	8e d0                	mov    %eax,%ss
+	mov %ax, %gs
+    7c09:	8e e8                	mov    %eax,%gs
+	mov %ax, %fs
+    7c0b:	8e e0                	mov    %eax,%fs
+	mov $_start, %esp
+    7c0d:	66 bc 00 7c          	mov    $0x7c00,%sp
+	...
+
+00007c13 <read_self_all>:
+	
+
+read_self_all:
+	mov $start_32, %bx
+    7c13:	bb 00 7e b9 02       	mov    $0x2b97e00,%ebx
+	mov $0x02, %cx
+    7c18:	00 b8 40 02 ba 80    	add    %bh,-0x7f45fdc0(%eax)
+	mov $0x240, %ax
+	mov $0x80, %dx
+    7c1e:	00 cd                	add    %cl,%ch
+	int $0x13 
+    7c20:	13 72 f0             	adc    -0x10(%edx),%esi
+	jc read_self_all
+
+	// 下面的代码将处理器从实模式切换到保护模式
+	cli                     // 关中断
+    7c23:	fa                   	cli    
+	lgdt gdt_desc      // 加载全局描述符表
+    7c24:	0f 01 16             	lgdtl  (%esi)
+    7c27:	40                   	inc    %eax
+    7c28:	7e 0f                	jle    7c39 <read_self_all+0x26>
+	lidt idt_desc      // 加载中断描述符表
+    7c2a:	01 1e                	add    %ebx,(%esi)
+    7c2c:	46                   	inc    %esi
+    7c2d:	7e 66                	jle    7c95 <read_self_all+0x82>
+	mov $1, %eax          // 设置CR0寄存器的PE位
+    7c2f:	b8 01 00 00 00       	mov    $0x1,%eax
+	lmsw %ax
+    7c34:	0f 01 f0             	lmsw   %ax
+	jmp $KERNEL_CODE_SEG, $start_32  // 跳转到32位代码段
+    7c37:	ea 00 7e 08 00 00 00 	ljmp   $0x0,$0x87e00
+	...
+    7dfe:	55                   	push   %ebp
+    7dff:	aa                   	stos   %al,%es:(%edi)
+
+00007e00 <start_32>:
+	// 32位保护模式, 位于512字节后
+	.code32
+	.text
+start_32:
+	// 下面的代码将段寄存器重新加载为保护模式下的段选择子
+	mov $KERNEL_DATA_SEG, %ax
+    7e00:	66 b8 10 00          	mov    $0x10,%ax
+	mov %ax, %ds
+    7e04:	8e d8                	mov    %eax,%ds
+	mov %ax, %es
+    7e06:	8e c0                	mov    %eax,%es
+	mov %ax, %ss
+    7e08:	8e d0                	mov    %eax,%ss
+	mov %ax, %gs
+    7e0a:	8e e8                	mov    %eax,%gs
+	mov %ax, %fs
+    7e0c:	8e e0                	mov    %eax,%fs
+	mov $_start, %esp
+    7e0e:	bc 00 7c 00 00       	mov    $0x7c00,%esp
+
+	call os_init  // 调用os_init函数初始化操作系统
+    7e13:	e8 53 00 00 00       	call   7e6b <os_init>
+	
+	// 下面的代码启用分页机制
+	mov $pg_dir, %eax
+    7e18:	b8 00 b0 00 00       	mov    $0xb000,%eax
+	mov %eax, %cr3         // 加载页目录基地址到CR3寄存器
+    7e1d:	0f 22 d8             	mov    %eax,%cr3
+
+	mov %cr4, %eax
+    7e20:	0f 20 e0             	mov    %cr4,%eax
+	orl $(1 << 4), %eax  // 设置CR4寄存器的PSE位
+    7e23:	83 c8 10             	or     $0x10,%eax
+	mov %eax, %cr4        // 启用分页机制
+    7e26:	0f 22 e0             	mov    %eax,%cr4
+
+	mov %cr0, %eax
+    7e29:	0f 20 c0             	mov    %cr0,%eax
+	orl $(1 << 31), %eax  // 设置CR0寄存器的PG位
+    7e2c:	0d 00 00 00 80       	or     $0x80000000,%eax
+	mov %eax, %cr0        // 启用分页机制
+    7e31:	0f 22 c0             	mov    %eax,%cr0
+
+	sti					 // 开中断
+    7e34:	fb                   	sti    
+	jmp .
+    7e35:	eb fe                	jmp    7e35 <start_32+0x35>
+
+00007e37 <irq0_handler>:
+
+irq0_handler:
+	push %ds
+    7e37:	1e                   	push   %ds
+	pusha
+    7e38:	60                   	pusha  
+	mov $0x20, %al
+    7e39:	b0 20                	mov    $0x20,%al
+	outb %al, $0x20       // 通知PIC芯片IRQ0中断处理完毕
+    7e3b:	e6 20                	out    %al,$0x20
+	popa
+    7e3d:	61                   	popa   
+	pop %ds
+    7e3e:	1f                   	pop    %ds
+	iret
+    7e3f:	cf                   	iret   
+
+00007e40 <gdt_desc>:
+    7e40:	ff 07                	incl   (%edi)
+    7e42:	00 c8                	add    %cl,%al
+	...
+
+00007e46 <idt_desc>:
+    7e46:	ff 07                	incl   (%edi)
+    7e48:	00 c0                	add    %al,%al
+	...
+
+00007e4c <outb>:
+struct {uint16_t limit_l, base_l, basehl_attr, base_limit;}gdt_table[256] __attribute__((aligned(8))) = {
+    [KERNEL_CODE_SEG / 8] = {0xFFFF, 0x0000, 0x9A00, 0x00CF},
+    [KERNEL_DATA_SEG / 8] = {0xFFFF, 0x0000, 0x9200, 0x00CF},
+};
+
+void outb(uint8_t val, uint16_t port){
+    7e4c:	55                   	push   %ebp
+    7e4d:	89 e5                	mov    %esp,%ebp
+    7e4f:	83 ec 08             	sub    $0x8,%esp
+    7e52:	8b 55 08             	mov    0x8(%ebp),%edx
+    7e55:	8b 45 0c             	mov    0xc(%ebp),%eax
+    7e58:	88 55 fc             	mov    %dl,-0x4(%ebp)
+    7e5b:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
+    __asm__ __volatile__ (
+    7e5f:	0f b6 45 fc          	movzbl -0x4(%ebp),%eax
+    7e63:	0f b7 55 f8          	movzwl -0x8(%ebp),%edx
+    7e67:	ee                   	out    %al,(%dx)
+        "outb %0, %1"
+        :
+        : "a"(val), "Nd"(port)
+    );
+}
+    7e68:	90                   	nop
+    7e69:	c9                   	leave  
+    7e6a:	c3                   	ret    
+
+00007e6b <os_init>:
+
+void irq0_handler(void);
+
+void os_init(void){
+    7e6b:	55                   	push   %ebp
+    7e6c:	89 e5                	mov    %esp,%ebp
+    7e6e:	83 ec 10             	sub    $0x10,%esp
+    outb(0x11, 0x20); // 主片
+    7e71:	6a 20                	push   $0x20
+    7e73:	6a 11                	push   $0x11
+    7e75:	e8 d2 ff ff ff       	call   7e4c <outb>
+    7e7a:	83 c4 08             	add    $0x8,%esp
+    outb(0x11, 0xA0); // 从片
+    7e7d:	68 a0 00 00 00       	push   $0xa0
+    7e82:	6a 11                	push   $0x11
+    7e84:	e8 c3 ff ff ff       	call   7e4c <outb>
+    7e89:	83 c4 08             	add    $0x8,%esp
+    outb(0x20, 0x21); // 主片中断0-7映射到32-39
+    7e8c:	6a 21                	push   $0x21
+    7e8e:	6a 20                	push   $0x20
+    7e90:	e8 b7 ff ff ff       	call   7e4c <outb>
+    7e95:	83 c4 08             	add    $0x8,%esp
+    outb(0x28, 0xA1); // 从片中断8-15映射到40-47
+    7e98:	68 a1 00 00 00       	push   $0xa1
+    7e9d:	6a 28                	push   $0x28
+    7e9f:	e8 a8 ff ff ff       	call   7e4c <outb>
+    7ea4:	83 c4 08             	add    $0x8,%esp
+    outb(0x04, 0x21); // 主片IR2接从片
+    7ea7:	6a 21                	push   $0x21
+    7ea9:	6a 04                	push   $0x4
+    7eab:	e8 9c ff ff ff       	call   7e4c <outb>
+    7eb0:	83 c4 08             	add    $0x8,%esp
+    outb(0x02, 0xA1); // 从片级联标志
+    7eb3:	68 a1 00 00 00       	push   $0xa1
+    7eb8:	6a 02                	push   $0x2
+    7eba:	e8 8d ff ff ff       	call   7e4c <outb>
+    7ebf:	83 c4 08             	add    $0x8,%esp
+    outb(0x01, 0x21); // 8086模式
+    7ec2:	6a 21                	push   $0x21
+    7ec4:	6a 01                	push   $0x1
+    7ec6:	e8 81 ff ff ff       	call   7e4c <outb>
+    7ecb:	83 c4 08             	add    $0x8,%esp
+    outb(0x01, 0xA1); // 8086模式
+    7ece:	68 a1 00 00 00       	push   $0xa1
+    7ed3:	6a 01                	push   $0x1
+    7ed5:	e8 72 ff ff ff       	call   7e4c <outb>
+    7eda:	83 c4 08             	add    $0x8,%esp
+    outb(0xff, 0x21); // 屏蔽所有中断
+    7edd:	6a 21                	push   $0x21
+    7edf:	68 ff 00 00 00       	push   $0xff
+    7ee4:	e8 63 ff ff ff       	call   7e4c <outb>
+    7ee9:	83 c4 08             	add    $0x8,%esp
+    outb(0xff, 0xA1); // 屏蔽所有中断
+    7eec:	68 a1 00 00 00       	push   $0xa1
+    7ef1:	68 ff 00 00 00       	push   $0xff
+    7ef6:	e8 51 ff ff ff       	call   7e4c <outb>
+    7efb:	83 c4 08             	add    $0x8,%esp
+
+    // 设置时钟中断频率为100ms
+    int clock_100ms = 1193180 / 100; 
+    7efe:	c7 45 fc 9b 2e 00 00 	movl   $0x2e9b,-0x4(%ebp)
+    outb(0x36, 0x43); // 选择通道0，方式3，二进制计数
+    7f05:	6a 43                	push   $0x43
+    7f07:	6a 36                	push   $0x36
+    7f09:	e8 3e ff ff ff       	call   7e4c <outb>
+    7f0e:	83 c4 08             	add    $0x8,%esp
+    outb((uint8_t)clock_100ms, 0x40);
+    7f11:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    7f14:	0f b6 c0             	movzbl %al,%eax
+    7f17:	6a 40                	push   $0x40
+    7f19:	50                   	push   %eax
+    7f1a:	e8 2d ff ff ff       	call   7e4c <outb>
+    7f1f:	83 c4 08             	add    $0x8,%esp
+    outb((clock_100ms >> 8) & 0xFF, 0x40);
+    7f22:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    7f25:	c1 f8 08             	sar    $0x8,%eax
+    7f28:	0f b6 c0             	movzbl %al,%eax
+    7f2b:	6a 40                	push   $0x40
+    7f2d:	50                   	push   %eax
+    7f2e:	e8 19 ff ff ff       	call   7e4c <outb>
+    7f33:	83 c4 08             	add    $0x8,%esp
+
+    idt_table[0x20].offset_l = (uint32_t)irq0_handler & 0xFFFF;
+    7f36:	b8 37 7e 00 00       	mov    $0x7e37,%eax
+    7f3b:	66 a3 00 c1 00 00    	mov    %ax,0xc100
+    idt_table[0x20].selector = KERNEL_CODE_SEG;
+    7f41:	66 c7 05 02 c1 00 00 	movw   $0x8,0xc102
+    7f48:	08 00 
+    idt_table[0x20].attr = 0x8E00; 
+    7f4a:	66 c7 05 04 c1 00 00 	movw   $0x8e00,0xc104
+    7f51:	00 8e 
+    idt_table[0x20].offset_h = (uint32_t)irq0_handler >> 16;
+    7f53:	b8 37 7e 00 00       	mov    $0x7e37,%eax
+    7f58:	c1 e8 10             	shr    $0x10,%eax
+    7f5b:	66 a3 06 c1 00 00    	mov    %ax,0xc106
+
+    pg_dir[MAP_PHY_ADDR >> 22] = ((uint32_t)pg_table | PDE_P | PDE_W | PDE_U); 
+    7f61:	b8 00 a0 00 00       	mov    $0xa000,%eax
+    7f66:	83 c8 07             	or     $0x7,%eax
+    7f69:	a3 00 b8 00 00       	mov    %eax,0xb800
+    pg_table[MAP_PHY_ADDR >> 12 & 0x3FF] = (uint32_t)map_phy_buffer | PDE_P | PDE_W | PDE_U;
+    7f6e:	b8 00 90 00 00       	mov    $0x9000,%eax
+    7f73:	83 c8 07             	or     $0x7,%eax
+    7f76:	a3 00 a0 00 00       	mov    %eax,0xa000
+
+    outb(0xFE, 0x21);
+    7f7b:	6a 21                	push   $0x21
+    7f7d:	68 fe 00 00 00       	push   $0xfe
+    7f82:	e8 c5 fe ff ff       	call   7e4c <outb>
+    7f87:	83 c4 08             	add    $0x8,%esp
+    7f8a:	90                   	nop
+    7f8b:	c9                   	leave  
+    7f8c:	c3                   	ret    
