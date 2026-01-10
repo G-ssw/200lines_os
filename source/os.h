@@ -13,4 +13,10 @@
 #define KERNEL_CODE_SEG 0x08
 #define KERNEL_DATA_SEG 0x10
 
+#define APP_CODE_SEG    (0x18 | 3)
+#define APP_DATA_SEG    (0x20 | 3)
+
+#define TASK0_TSS_SEL   0x28
+#define TASK1_TSS_SEL   0x30
+
 #endif // OS_H

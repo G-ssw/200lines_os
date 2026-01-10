@@ -12,6 +12,9 @@
 	// 声明本地以下符号是全局的，在其它源文件中可以访问
 	.global _start, irq0_handler
 
+	// 当需要引用外部的符号是，使用extern声明。相当于C语言中的extern
+	.extern gdt_table, pg_dir, idt_table, os_init, task_0
+	
 	// 指定以下的代码生成16位的机器指令，这样才能在启动时的实模式下运行
   	.code16
 
@@ -73,14 +76,39 @@ start_32:
 	orl $(1 << 31), %eax  // 设置CR0寄存器的PG位
 	mov %eax, %cr0        // 启用分页机制
 
-	sti					 // 开中断
-	jmp .
+	// 加载任务0的TSS（使用ltr指令）
+    mov $TASK0_TSS_SEL, %ax
+    ltr %ax
+
+	push $APP_DATA_SEG
+	push $task0_dpl3_stack + 1024 * 4 // 任务0的栈顶地址
+	// 以下代码模拟中断返回，跳转到任务0入口点运行
+	push $0x202 	 // EFLAGS寄存器的IF位设置为1，启用中断
+	push $APP_CODE_SEG
+	push $task_0_entry
+	iret              // 通过iret指令跳转到任务0入口点
+
+
+task_0_entry:
+	mov %ss, %ax
+	mov %ax, %ds
+	mov %ax, %es
+	mov %ax, %gs
+	mov %ax, %fs
+	jmp task_0
 
 irq0_handler:
 	push %ds
 	pusha
 	mov $0x20, %al
 	outb %al, $0x20       // 通知PIC芯片IRQ0中断处理完毕
+
+    mov $KERNEL_DATA_SEG, %ax
+    mov %ax, %ds
+    mov %ax, %es
+    
+    call task_sched
+
 	popa
 	pop %ds
 	iret

@@ -7,34 +7,37 @@ start address 0x00007c00
 
 Program Header:
     LOAD off    0x00000000 vaddr 0x00007000 paddr 0x00007000 align 2**12
-         filesz 0x00000fe8 memsz 0x00000fe8 flags r-x
-    LOAD off    0x00001000 vaddr 0x00009000 paddr 0x00009000 align 2**12
-         filesz 0x00004000 memsz 0x00004000 flags rw-
+         filesz 0x00001140 memsz 0x00001140 flags r-x
+    LOAD off    0x00002000 vaddr 0x00009000 paddr 0x00009000 align 2**12
+         filesz 0x000040ec memsz 0x00008100 flags rw-
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         0000038d  00007c00  00007c00  00000c00  2**0
+  0 .text         0000048f  00007c00  00007c00  00000c00  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .eh_frame     00000058  00007f90  00007f90  00000f90  2**2
+  1 .eh_frame     000000b0  00008090  00008090  00001090  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  2 .data         00004000  00009000  00009000  00001000  2**12
+  2 .data         000040ec  00009000  00009000  00002000  2**12
                   CONTENTS, ALLOC, LOAD, DATA
-  3 .comment      00000011  00000000  00000000  00005000  2**0
+  3 .bss          00004000  0000d100  0000d100  000060ec  2**5
+                  ALLOC
+  4 .comment      00000011  00000000  00000000  000060ec  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000040  00000000  00000000  00005018  2**3
+  5 .debug_aranges 00000040  00000000  00000000  00006100  2**3
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000223  00000000  00000000  00005058  2**0
+  6 .debug_info   00000311  00000000  00000000  00006140  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 0000011b  00000000  00000000  0000527b  2**0
+  7 .debug_abbrev 00000146  00000000  00000000  00006451  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000000c6  00000000  00000000  00005396  2**0
+  8 .debug_line   000000f5  00000000  00000000  00006597  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_str    00000156  00000000  00000000  0000545c  2**0
+  9 .debug_str    000001cf  00000000  00000000  0000668c  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 00007c00 l    d  .text	00000000 .text
-00007f90 l    d  .eh_frame	00000000 .eh_frame
+00008090 l    d  .eh_frame	00000000 .eh_frame
 00009000 l    d  .data	00000000 .data
+0000d100 l    d  .bss	00000000 .bss
 00000000 l    d  .comment	00000000 .comment
 00000000 l    d  .debug_aranges	00000000 .debug_aranges
 00000000 l    d  .debug_info	00000000 .debug_info
@@ -44,21 +47,32 @@ SYMBOL TABLE:
 00000000 l    df *ABS*	00000000 start.o
 00007c13 l       .text	00000000 read_self_all
 00007e00 l       .text	00000000 start_32
-00007e40 l       .text	00000000 gdt_desc
-00007e46 l       .text	00000000 idt_desc
+00007e75 l       .text	00000000 gdt_desc
+00007e7b l       .text	00000000 idt_desc
+00007e4f l       .text	00000000 task_0_entry
 00000000 l    df *ABS*	00000000 os.c
 0000a000 l     O .data	00001000 pg_table
+0000d0e8 l     O .data	00000004 current_task.1767
 0000c800 g     O .data	00000800 gdt_table
+0000d100 g     O .bss	00001000 task0_dpl3_stack
+0000e100 g     O .bss	00001000 task1_dpl3_stack
+00007ea0 g     F .text	00000016 task_0
+0000d000 g     O .data	00000068 task0_tss
 00009000 g     O .data	00001000 map_phy_buffer
-00007e6b g     F .text	00000122 os_init
+00007f09 g     F .text	00000186 os_init
+0000f100 g     O .bss	00001000 task1_dpl0_stack
+0000d080 g     O .data	00000068 task1_tss
 00007c00 g       .text	00000000 _start
-00007e4c g     F .text	0000001f outb
-0000d000 g       .data	00000000 __bss_start
+00007e81 g     F .text	0000001f outb
+0000d0ec g       .bss	00000000 __bss_start
 0000b000 g     O .data	00001000 pg_dir
-0000d000 g       .data	00000000 _edata
-0000d000 g       .data	00000000 _end
+0000d0ec g       .data	00000000 _edata
+00011100 g       .bss	00000000 _end
+00007eb6 g     F .text	00000016 task_1
 0000c000 g     O .data	00000800 idt_table
-00007e37 g       .text	00000000 irq0_handler
+00007e5f g       .text	00000000 irq0_handler
+00010100 g     O .bss	00001000 task0_dpl0_stack
+00007ecc g     F .text	0000003d task_sched
 
 
 
@@ -105,14 +119,13 @@ read_self_all:
     7c23:	fa                   	cli    
 	lgdt gdt_desc      // 加载全局描述符表
     7c24:	0f 01 16             	lgdtl  (%esi)
-    7c27:	40                   	inc    %eax
-    7c28:	7e 0f                	jle    7c39 <read_self_all+0x26>
+    7c27:	75 7e                	jne    7ca7 <read_self_all+0x94>
 	lidt idt_desc      // 加载中断描述符表
-    7c2a:	01 1e                	add    %ebx,(%esi)
-    7c2c:	46                   	inc    %esi
-    7c2d:	7e 66                	jle    7c95 <read_self_all+0x82>
+    7c29:	0f 01 1e             	lidtl  (%esi)
+    7c2c:	7b 7e                	jnp    7cac <read_self_all+0x99>
 	mov $1, %eax          // 设置CR0寄存器的PE位
-    7c2f:	b8 01 00 00 00       	mov    $0x1,%eax
+    7c2e:	66 b8 01 00          	mov    $0x1,%ax
+    7c32:	00 00                	add    %al,(%eax)
 	lmsw %ax
     7c34:	0f 01 f0             	lmsw   %ax
 	jmp $KERNEL_CODE_SEG, $start_32  // 跳转到32位代码段
@@ -143,7 +156,7 @@ start_32:
     7e0e:	bc 00 7c 00 00       	mov    $0x7c00,%esp
 
 	call os_init  // 调用os_init函数初始化操作系统
-    7e13:	e8 53 00 00 00       	call   7e6b <os_init>
+    7e13:	e8 f1 00 00 00       	call   7f09 <os_init>
 	
 	// 下面的代码启用分页机制
 	mov $pg_dir, %eax
@@ -165,177 +178,327 @@ start_32:
 	mov %eax, %cr0        // 启用分页机制
     7e31:	0f 22 c0             	mov    %eax,%cr0
 
-	sti					 // 开中断
-    7e34:	fb                   	sti    
-	jmp .
-    7e35:	eb fe                	jmp    7e35 <start_32+0x35>
+	// 加载任务0的TSS（使用ltr指令）
+    mov $TASK0_TSS_SEL, %ax
+    7e34:	66 b8 28 00          	mov    $0x28,%ax
+    ltr %ax
+    7e38:	0f 00 d8             	ltr    %ax
 
-00007e37 <irq0_handler>:
+	push $APP_DATA_SEG
+    7e3b:	6a 23                	push   $0x23
+	push $task0_dpl3_stack + 1024 * 4 // 任务0的栈顶地址
+    7e3d:	68 00 e1 00 00       	push   $0xe100
+	// 以下代码模拟中断返回，跳转到任务0入口点运行
+	push $0x202 	 // EFLAGS寄存器的IF位设置为1，启用中断
+    7e42:	68 02 02 00 00       	push   $0x202
+	push $APP_CODE_SEG
+    7e47:	6a 1b                	push   $0x1b
+	push $task_0_entry
+    7e49:	68 4f 7e 00 00       	push   $0x7e4f
+	iret              // 通过iret指令跳转到任务0入口点
+    7e4e:	cf                   	iret   
+
+00007e4f <task_0_entry>:
+
+
+task_0_entry:
+	mov %ss, %ax
+    7e4f:	66 8c d0             	mov    %ss,%ax
+	mov %ax, %ds
+    7e52:	8e d8                	mov    %eax,%ds
+	mov %ax, %es
+    7e54:	8e c0                	mov    %eax,%es
+	mov %ax, %gs
+    7e56:	8e e8                	mov    %eax,%gs
+	mov %ax, %fs
+    7e58:	8e e0                	mov    %eax,%fs
+	jmp task_0
+    7e5a:	e9 41 00 00 00       	jmp    7ea0 <task_0>
+
+00007e5f <irq0_handler>:
 
 irq0_handler:
 	push %ds
-    7e37:	1e                   	push   %ds
+    7e5f:	1e                   	push   %ds
 	pusha
-    7e38:	60                   	pusha  
+    7e60:	60                   	pusha  
 	mov $0x20, %al
-    7e39:	b0 20                	mov    $0x20,%al
+    7e61:	b0 20                	mov    $0x20,%al
 	outb %al, $0x20       // 通知PIC芯片IRQ0中断处理完毕
-    7e3b:	e6 20                	out    %al,$0x20
+    7e63:	e6 20                	out    %al,$0x20
+
+    mov $KERNEL_DATA_SEG, %ax
+    7e65:	66 b8 10 00          	mov    $0x10,%ax
+    mov %ax, %ds
+    7e69:	8e d8                	mov    %eax,%ds
+    mov %ax, %es
+    7e6b:	8e c0                	mov    %eax,%es
+    
+    call task_sched
+    7e6d:	e8 5a 00 00 00       	call   7ecc <task_sched>
+
 	popa
-    7e3d:	61                   	popa   
+    7e72:	61                   	popa   
 	pop %ds
-    7e3e:	1f                   	pop    %ds
+    7e73:	1f                   	pop    %ds
 	iret
-    7e3f:	cf                   	iret   
+    7e74:	cf                   	iret   
 
-00007e40 <gdt_desc>:
-    7e40:	ff 07                	incl   (%edi)
-    7e42:	00 c8                	add    %cl,%al
+00007e75 <gdt_desc>:
+    7e75:	ff 07                	incl   (%edi)
+    7e77:	00 c8                	add    %cl,%al
 	...
 
-00007e46 <idt_desc>:
-    7e46:	ff 07                	incl   (%edi)
-    7e48:	00 c0                	add    %al,%al
+00007e7b <idt_desc>:
+    7e7b:	ff 07                	incl   (%edi)
+    7e7d:	00 c0                	add    %al,%al
 	...
 
-00007e4c <outb>:
-struct {uint16_t limit_l, base_l, basehl_attr, base_limit;}gdt_table[256] __attribute__((aligned(8))) = {
-    [KERNEL_CODE_SEG / 8] = {0xFFFF, 0x0000, 0x9A00, 0x00CF},
-    [KERNEL_DATA_SEG / 8] = {0xFFFF, 0x0000, 0x9200, 0x00CF},
+00007e81 <outb>:
+
+    [TASK0_TSS_SEL / 8]   = {0x0068, 0, 0xE900, 0x0},  
+    [TASK1_TSS_SEL / 8]   = {0x0068, 0, 0xE900, 0x0},
 };
 
 void outb(uint8_t val, uint16_t port){
-    7e4c:	55                   	push   %ebp
-    7e4d:	89 e5                	mov    %esp,%ebp
-    7e4f:	83 ec 08             	sub    $0x8,%esp
-    7e52:	8b 55 08             	mov    0x8(%ebp),%edx
-    7e55:	8b 45 0c             	mov    0xc(%ebp),%eax
-    7e58:	88 55 fc             	mov    %dl,-0x4(%ebp)
-    7e5b:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
+    7e81:	55                   	push   %ebp
+    7e82:	89 e5                	mov    %esp,%ebp
+    7e84:	83 ec 08             	sub    $0x8,%esp
+    7e87:	8b 55 08             	mov    0x8(%ebp),%edx
+    7e8a:	8b 45 0c             	mov    0xc(%ebp),%eax
+    7e8d:	88 55 fc             	mov    %dl,-0x4(%ebp)
+    7e90:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
     __asm__ __volatile__ (
-    7e5f:	0f b6 45 fc          	movzbl -0x4(%ebp),%eax
-    7e63:	0f b7 55 f8          	movzwl -0x8(%ebp),%edx
-    7e67:	ee                   	out    %al,(%dx)
+    7e94:	0f b6 45 fc          	movzbl -0x4(%ebp),%eax
+    7e98:	0f b7 55 f8          	movzwl -0x8(%ebp),%edx
+    7e9c:	ee                   	out    %al,(%dx)
         "outb %0, %1"
         :
         : "a"(val), "Nd"(port)
     );
 }
-    7e68:	90                   	nop
-    7e69:	c9                   	leave  
-    7e6a:	c3                   	ret    
+    7e9d:	90                   	nop
+    7e9e:	c9                   	leave  
+    7e9f:	c3                   	ret    
 
-00007e6b <os_init>:
+00007ea0 <task_0>:
+
+void task_0 (void) {
+    7ea0:	55                   	push   %ebp
+    7ea1:	89 e5                	mov    %esp,%ebp
+    7ea3:	83 ec 10             	sub    $0x10,%esp
+    uint8_t color = 0;
+    7ea6:	c6 45 ff 00          	movb   $0x0,-0x1(%ebp)
+    for (;;) {
+        color++;
+    7eaa:	0f b6 45 ff          	movzbl -0x1(%ebp),%eax
+    7eae:	83 c0 01             	add    $0x1,%eax
+    7eb1:	88 45 ff             	mov    %al,-0x1(%ebp)
+    7eb4:	eb f4                	jmp    7eaa <task_0+0xa>
+
+00007eb6 <task_1>:
+    }
+}
+
+// 任务1函数（任务0已经有了）
+void task_1(void) {
+    7eb6:	55                   	push   %ebp
+    7eb7:	89 e5                	mov    %esp,%ebp
+    7eb9:	83 ec 10             	sub    $0x10,%esp
+    uint8_t color = 0xff;
+    7ebc:	c6 45 ff ff          	movb   $0xff,-0x1(%ebp)
+
+    for (;;) {
+        color--;
+    7ec0:	0f b6 45 ff          	movzbl -0x1(%ebp),%eax
+    7ec4:	83 e8 01             	sub    $0x1,%eax
+    7ec7:	88 45 ff             	mov    %al,-0x1(%ebp)
+    7eca:	eb f4                	jmp    7ec0 <task_1+0xa>
+
+00007ecc <task_sched>:
+    }
+}
+
+// 任务调度函数
+void task_sched(void) {
+    7ecc:	55                   	push   %ebp
+    7ecd:	89 e5                	mov    %esp,%ebp
+    7ecf:	83 ec 10             	sub    $0x10,%esp
+    static int current_task = TASK0_TSS_SEL;
+    
+    // 切换任务
+    if (current_task == TASK0_TSS_SEL) {
+    7ed2:	a1 e8 d0 00 00       	mov    0xd0e8,%eax
+    7ed7:	83 f8 28             	cmp    $0x28,%eax
+    7eda:	75 0c                	jne    7ee8 <task_sched+0x1c>
+        current_task = TASK1_TSS_SEL;
+    7edc:	c7 05 e8 d0 00 00 30 	movl   $0x30,0xd0e8
+    7ee3:	00 00 00 
+    7ee6:	eb 0a                	jmp    7ef2 <task_sched+0x26>
+    } else {
+        current_task = TASK0_TSS_SEL;
+    7ee8:	c7 05 e8 d0 00 00 28 	movl   $0x28,0xd0e8
+    7eef:	00 00 00 
+    }
+    
+    // 使用远跳转切换到新任务
+    // 这个数组[0, 选择子]构成一个远指针
+    uint32_t jump_addr[] = {0, current_task};
+    7ef2:	c7 45 f8 00 00 00 00 	movl   $0x0,-0x8(%ebp)
+    7ef9:	a1 e8 d0 00 00       	mov    0xd0e8,%eax
+    7efe:	89 45 fc             	mov    %eax,-0x4(%ebp)
+    
+    // ljmpl指令：跳转到TSS选择子，触发任务切换
+    __asm__ __volatile__("ljmpl *(%0)" : : "r"(jump_addr));
+    7f01:	8d 45 f8             	lea    -0x8(%ebp),%eax
+    7f04:	ff 28                	ljmp   *(%eax)
+}
+    7f06:	90                   	nop
+    7f07:	c9                   	leave  
+    7f08:	c3                   	ret    
+
+00007f09 <os_init>:
+};
+
 
 void irq0_handler(void);
 
 void os_init(void){
-    7e6b:	55                   	push   %ebp
-    7e6c:	89 e5                	mov    %esp,%ebp
-    7e6e:	83 ec 10             	sub    $0x10,%esp
+    7f09:	55                   	push   %ebp
+    7f0a:	89 e5                	mov    %esp,%ebp
+    7f0c:	83 ec 10             	sub    $0x10,%esp
     outb(0x11, 0x20); // 主片
-    7e71:	6a 20                	push   $0x20
-    7e73:	6a 11                	push   $0x11
-    7e75:	e8 d2 ff ff ff       	call   7e4c <outb>
-    7e7a:	83 c4 08             	add    $0x8,%esp
+    7f0f:	6a 20                	push   $0x20
+    7f11:	6a 11                	push   $0x11
+    7f13:	e8 69 ff ff ff       	call   7e81 <outb>
+    7f18:	83 c4 08             	add    $0x8,%esp
     outb(0x11, 0xA0); // 从片
-    7e7d:	68 a0 00 00 00       	push   $0xa0
-    7e82:	6a 11                	push   $0x11
-    7e84:	e8 c3 ff ff ff       	call   7e4c <outb>
-    7e89:	83 c4 08             	add    $0x8,%esp
+    7f1b:	68 a0 00 00 00       	push   $0xa0
+    7f20:	6a 11                	push   $0x11
+    7f22:	e8 5a ff ff ff       	call   7e81 <outb>
+    7f27:	83 c4 08             	add    $0x8,%esp
     outb(0x20, 0x21); // 主片中断0-7映射到32-39
-    7e8c:	6a 21                	push   $0x21
-    7e8e:	6a 20                	push   $0x20
-    7e90:	e8 b7 ff ff ff       	call   7e4c <outb>
-    7e95:	83 c4 08             	add    $0x8,%esp
+    7f2a:	6a 21                	push   $0x21
+    7f2c:	6a 20                	push   $0x20
+    7f2e:	e8 4e ff ff ff       	call   7e81 <outb>
+    7f33:	83 c4 08             	add    $0x8,%esp
     outb(0x28, 0xA1); // 从片中断8-15映射到40-47
-    7e98:	68 a1 00 00 00       	push   $0xa1
-    7e9d:	6a 28                	push   $0x28
-    7e9f:	e8 a8 ff ff ff       	call   7e4c <outb>
-    7ea4:	83 c4 08             	add    $0x8,%esp
+    7f36:	68 a1 00 00 00       	push   $0xa1
+    7f3b:	6a 28                	push   $0x28
+    7f3d:	e8 3f ff ff ff       	call   7e81 <outb>
+    7f42:	83 c4 08             	add    $0x8,%esp
     outb(0x04, 0x21); // 主片IR2接从片
-    7ea7:	6a 21                	push   $0x21
-    7ea9:	6a 04                	push   $0x4
-    7eab:	e8 9c ff ff ff       	call   7e4c <outb>
-    7eb0:	83 c4 08             	add    $0x8,%esp
+    7f45:	6a 21                	push   $0x21
+    7f47:	6a 04                	push   $0x4
+    7f49:	e8 33 ff ff ff       	call   7e81 <outb>
+    7f4e:	83 c4 08             	add    $0x8,%esp
     outb(0x02, 0xA1); // 从片级联标志
-    7eb3:	68 a1 00 00 00       	push   $0xa1
-    7eb8:	6a 02                	push   $0x2
-    7eba:	e8 8d ff ff ff       	call   7e4c <outb>
-    7ebf:	83 c4 08             	add    $0x8,%esp
+    7f51:	68 a1 00 00 00       	push   $0xa1
+    7f56:	6a 02                	push   $0x2
+    7f58:	e8 24 ff ff ff       	call   7e81 <outb>
+    7f5d:	83 c4 08             	add    $0x8,%esp
     outb(0x01, 0x21); // 8086模式
-    7ec2:	6a 21                	push   $0x21
-    7ec4:	6a 01                	push   $0x1
-    7ec6:	e8 81 ff ff ff       	call   7e4c <outb>
-    7ecb:	83 c4 08             	add    $0x8,%esp
+    7f60:	6a 21                	push   $0x21
+    7f62:	6a 01                	push   $0x1
+    7f64:	e8 18 ff ff ff       	call   7e81 <outb>
+    7f69:	83 c4 08             	add    $0x8,%esp
     outb(0x01, 0xA1); // 8086模式
-    7ece:	68 a1 00 00 00       	push   $0xa1
-    7ed3:	6a 01                	push   $0x1
-    7ed5:	e8 72 ff ff ff       	call   7e4c <outb>
-    7eda:	83 c4 08             	add    $0x8,%esp
+    7f6c:	68 a1 00 00 00       	push   $0xa1
+    7f71:	6a 01                	push   $0x1
+    7f73:	e8 09 ff ff ff       	call   7e81 <outb>
+    7f78:	83 c4 08             	add    $0x8,%esp
     outb(0xff, 0x21); // 屏蔽所有中断
-    7edd:	6a 21                	push   $0x21
-    7edf:	68 ff 00 00 00       	push   $0xff
-    7ee4:	e8 63 ff ff ff       	call   7e4c <outb>
-    7ee9:	83 c4 08             	add    $0x8,%esp
+    7f7b:	6a 21                	push   $0x21
+    7f7d:	68 ff 00 00 00       	push   $0xff
+    7f82:	e8 fa fe ff ff       	call   7e81 <outb>
+    7f87:	83 c4 08             	add    $0x8,%esp
     outb(0xff, 0xA1); // 屏蔽所有中断
-    7eec:	68 a1 00 00 00       	push   $0xa1
-    7ef1:	68 ff 00 00 00       	push   $0xff
-    7ef6:	e8 51 ff ff ff       	call   7e4c <outb>
-    7efb:	83 c4 08             	add    $0x8,%esp
+    7f8a:	68 a1 00 00 00       	push   $0xa1
+    7f8f:	68 ff 00 00 00       	push   $0xff
+    7f94:	e8 e8 fe ff ff       	call   7e81 <outb>
+    7f99:	83 c4 08             	add    $0x8,%esp
 
     // 设置时钟中断频率为100ms
     int clock_100ms = 1193180 / 100; 
-    7efe:	c7 45 fc 9b 2e 00 00 	movl   $0x2e9b,-0x4(%ebp)
+    7f9c:	c7 45 fc 9b 2e 00 00 	movl   $0x2e9b,-0x4(%ebp)
     outb(0x36, 0x43); // 选择通道0，方式3，二进制计数
-    7f05:	6a 43                	push   $0x43
-    7f07:	6a 36                	push   $0x36
-    7f09:	e8 3e ff ff ff       	call   7e4c <outb>
-    7f0e:	83 c4 08             	add    $0x8,%esp
+    7fa3:	6a 43                	push   $0x43
+    7fa5:	6a 36                	push   $0x36
+    7fa7:	e8 d5 fe ff ff       	call   7e81 <outb>
+    7fac:	83 c4 08             	add    $0x8,%esp
     outb((uint8_t)clock_100ms, 0x40);
-    7f11:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    7f14:	0f b6 c0             	movzbl %al,%eax
-    7f17:	6a 40                	push   $0x40
-    7f19:	50                   	push   %eax
-    7f1a:	e8 2d ff ff ff       	call   7e4c <outb>
-    7f1f:	83 c4 08             	add    $0x8,%esp
+    7faf:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    7fb2:	0f b6 c0             	movzbl %al,%eax
+    7fb5:	6a 40                	push   $0x40
+    7fb7:	50                   	push   %eax
+    7fb8:	e8 c4 fe ff ff       	call   7e81 <outb>
+    7fbd:	83 c4 08             	add    $0x8,%esp
     outb((clock_100ms >> 8) & 0xFF, 0x40);
-    7f22:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    7f25:	c1 f8 08             	sar    $0x8,%eax
-    7f28:	0f b6 c0             	movzbl %al,%eax
-    7f2b:	6a 40                	push   $0x40
-    7f2d:	50                   	push   %eax
-    7f2e:	e8 19 ff ff ff       	call   7e4c <outb>
-    7f33:	83 c4 08             	add    $0x8,%esp
+    7fc0:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    7fc3:	c1 f8 08             	sar    $0x8,%eax
+    7fc6:	0f b6 c0             	movzbl %al,%eax
+    7fc9:	6a 40                	push   $0x40
+    7fcb:	50                   	push   %eax
+    7fcc:	e8 b0 fe ff ff       	call   7e81 <outb>
+    7fd1:	83 c4 08             	add    $0x8,%esp
 
     idt_table[0x20].offset_l = (uint32_t)irq0_handler & 0xFFFF;
-    7f36:	b8 37 7e 00 00       	mov    $0x7e37,%eax
-    7f3b:	66 a3 00 c1 00 00    	mov    %ax,0xc100
+    7fd4:	b8 5f 7e 00 00       	mov    $0x7e5f,%eax
+    7fd9:	66 a3 00 c1 00 00    	mov    %ax,0xc100
     idt_table[0x20].selector = KERNEL_CODE_SEG;
-    7f41:	66 c7 05 02 c1 00 00 	movw   $0x8,0xc102
-    7f48:	08 00 
+    7fdf:	66 c7 05 02 c1 00 00 	movw   $0x8,0xc102
+    7fe6:	08 00 
     idt_table[0x20].attr = 0x8E00; 
-    7f4a:	66 c7 05 04 c1 00 00 	movw   $0x8e00,0xc104
-    7f51:	00 8e 
+    7fe8:	66 c7 05 04 c1 00 00 	movw   $0x8e00,0xc104
+    7fef:	00 8e 
     idt_table[0x20].offset_h = (uint32_t)irq0_handler >> 16;
-    7f53:	b8 37 7e 00 00       	mov    $0x7e37,%eax
-    7f58:	c1 e8 10             	shr    $0x10,%eax
-    7f5b:	66 a3 06 c1 00 00    	mov    %ax,0xc106
+    7ff1:	b8 5f 7e 00 00       	mov    $0x7e5f,%eax
+    7ff6:	c1 e8 10             	shr    $0x10,%eax
+    7ff9:	66 a3 06 c1 00 00    	mov    %ax,0xc106
 
     pg_dir[MAP_PHY_ADDR >> 22] = ((uint32_t)pg_table | PDE_P | PDE_W | PDE_U); 
-    7f61:	b8 00 a0 00 00       	mov    $0xa000,%eax
-    7f66:	83 c8 07             	or     $0x7,%eax
-    7f69:	a3 00 b8 00 00       	mov    %eax,0xb800
+    7fff:	b8 00 a0 00 00       	mov    $0xa000,%eax
+    8004:	83 c8 07             	or     $0x7,%eax
+    8007:	a3 00 b8 00 00       	mov    %eax,0xb800
     pg_table[MAP_PHY_ADDR >> 12 & 0x3FF] = (uint32_t)map_phy_buffer | PDE_P | PDE_W | PDE_U;
-    7f6e:	b8 00 90 00 00       	mov    $0x9000,%eax
-    7f73:	83 c8 07             	or     $0x7,%eax
-    7f76:	a3 00 a0 00 00       	mov    %eax,0xa000
+    800c:	b8 00 90 00 00       	mov    $0x9000,%eax
+    8011:	83 c8 07             	or     $0x7,%eax
+    8014:	a3 00 a0 00 00       	mov    %eax,0xa000
 
-    outb(0xFE, 0x21);
-    7f7b:	6a 21                	push   $0x21
-    7f7d:	68 fe 00 00 00       	push   $0xfe
-    7f82:	e8 c5 fe ff ff       	call   7e4c <outb>
-    7f87:	83 c4 08             	add    $0x8,%esp
-    7f8a:	90                   	nop
-    7f8b:	c9                   	leave  
-    7f8c:	c3                   	ret    
+    outb(0xFE, 0x21); // 取消中断屏蔽，打开时钟中断IRQ0
+    8019:	6a 21                	push   $0x21
+    801b:	68 fe 00 00 00       	push   $0xfe
+    8020:	e8 5c fe ff ff       	call   7e81 <outb>
+    8025:	83 c4 08             	add    $0x8,%esp
+
+    // 初始化TSS描述符的基址
+    gdt_table[TASK0_TSS_SEL / 8].base_l = (uint16_t)((uint32_t)task0_tss & 0xFFFF);
+    8028:	b8 00 d0 00 00       	mov    $0xd000,%eax
+    802d:	66 a3 2a c8 00 00    	mov    %ax,0xc82a
+    gdt_table[TASK0_TSS_SEL / 8].basehl_attr |= ((uint32_t)os_init >> 16) & 0xFF;
+    8033:	0f b7 15 2c c8 00 00 	movzwl 0xc82c,%edx
+    803a:	b8 09 7f 00 00       	mov    $0x7f09,%eax
+    803f:	c1 e8 10             	shr    $0x10,%eax
+    8042:	0f b6 c0             	movzbl %al,%eax
+    8045:	09 d0                	or     %edx,%eax
+    8047:	66 a3 2c c8 00 00    	mov    %ax,0xc82c
+    gdt_table[TASK0_TSS_SEL / 8].base_limit |= ((uint32_t)task0_tss >> 24) << 24;
+    804d:	0f b7 05 2e c8 00 00 	movzwl 0xc82e,%eax
+    8054:	66 a3 2e c8 00 00    	mov    %ax,0xc82e
+    
+    gdt_table[TASK1_TSS_SEL / 8].base_l = (uint16_t)((uint32_t)task1_tss & 0xFFFF);
+    805a:	b8 80 d0 00 00       	mov    $0xd080,%eax
+    805f:	66 a3 32 c8 00 00    	mov    %ax,0xc832
+    gdt_table[TASK1_TSS_SEL / 8].basehl_attr |= ((uint32_t)task1_tss >> 16) & 0xFF;
+    8065:	0f b7 15 34 c8 00 00 	movzwl 0xc834,%edx
+    806c:	b8 80 d0 00 00       	mov    $0xd080,%eax
+    8071:	c1 e8 10             	shr    $0x10,%eax
+    8074:	0f b6 c0             	movzbl %al,%eax
+    8077:	09 d0                	or     %edx,%eax
+    8079:	66 a3 34 c8 00 00    	mov    %ax,0xc834
+    gdt_table[TASK1_TSS_SEL / 8].base_limit |= ((uint32_t)task1_tss >> 24) << 24;
+    807f:	0f b7 05 36 c8 00 00 	movzwl 0xc836,%eax
+    8086:	66 a3 36 c8 00 00    	mov    %ax,0xc836
+    808c:	90                   	nop
+    808d:	c9                   	leave  
+    808e:	c3                   	ret    

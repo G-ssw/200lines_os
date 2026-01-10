@@ -27,11 +27,23 @@ uint32_t pg_dir[1024] __attribute__((aligned(4096)))= {
     [0] = (0x00000000 | PDE_P | PDE_W | PDE_U | PDE_PS),          // 前4MB，4MB大页
 };
 
+// 任务栈定义（每个任务需要两个栈：DPL0和DPL3）
+uint32_t task0_dpl0_stack[1024], task0_dpl3_stack[1024];
+uint32_t task1_dpl0_stack[1024], task1_dpl3_stack[1024];
+
+
+
 struct{uint16_t offset_l, selector, attr, offset_h;}idt_table[256] __attribute__((aligned(8))) = {1};
 
 struct {uint16_t limit_l, base_l, basehl_attr, base_limit;}gdt_table[256] __attribute__((aligned(8))) = {
     [KERNEL_CODE_SEG / 8] = {0xFFFF, 0x0000, 0x9A00, 0x00CF},
     [KERNEL_DATA_SEG / 8] = {0xFFFF, 0x0000, 0x9200, 0x00CF},
+    
+    [APP_CODE_SEG / 8]    = {0xFFFF, 0x0000, 0xFA00, 0x00CF},
+    [APP_DATA_SEG / 8]    = {0xFFFF, 0x0000, 0xF300, 0x00CF},
+
+    [TASK0_TSS_SEL / 8]   = {0x0068, 0, 0xE900, 0x0},  
+    [TASK1_TSS_SEL / 8]   = {0x0068, 0, 0xE900, 0x0},
 };
 
 void outb(uint8_t val, uint16_t port){
@@ -41,6 +53,78 @@ void outb(uint8_t val, uint16_t port){
         : "a"(val), "Nd"(port)
     );
 }
+
+void task_0 (void) {
+    uint8_t color = 0;
+    for (;;) {
+        color++;
+    }
+}
+
+// 任务1函数（任务0已经有了）
+void task_1(void) {
+    uint8_t color = 0xff;
+
+    for (;;) {
+        color--;
+    }
+}
+
+// 任务调度函数
+void task_sched(void) {
+    static int current_task = TASK0_TSS_SEL;
+    
+    // 切换任务
+    if (current_task == TASK0_TSS_SEL) {
+        current_task = TASK1_TSS_SEL;
+    } else {
+        current_task = TASK0_TSS_SEL;
+    }
+    
+    // 使用远跳转切换到新任务
+    // 这个数组[0, 选择子]构成一个远指针
+    uint32_t jump_addr[] = {0, current_task};
+    
+    // ljmpl指令：跳转到TSS选择子，触发任务切换
+    __asm__ __volatile__("ljmpl *(%0)" : : "r"(jump_addr));
+}
+
+// 任务0的TSS定义
+uint32_t task0_tss[] = {
+    // prelink, esp0, ss0, esp1, ss1, esp2, ss2
+    0,  (uint32_t)task0_dpl0_stack + 4*1024, KERNEL_DATA_SEG, 
+    0x0, 0x0, 0x0, 0x0,  // esp1-ss2不用
+    
+    // cr3, eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi
+    (uint32_t)pg_dir,  (uint32_t)task_0, 0x202,  // 页目录、入口点、标志
+    0xa, 0xc, 0xd, 0xb,                         // eax, ecx, edx, ebx
+    (uint32_t)task0_dpl3_stack + 4*1024,        // 用户栈（esp）
+    0x1, 0x2, 0x3,                              // ebp, esi, edi
+    
+    // es, cs, ss, ds, fs, gs, ldt, iomap
+    APP_DATA_SEG, APP_CODE_SEG, APP_DATA_SEG, 
+    APP_DATA_SEG, APP_DATA_SEG, APP_DATA_SEG, 
+    0x0, 0x0,                                   // ldt, iomap
+};
+
+// 任务1的TSS定义
+uint32_t task1_tss[] = {
+    // prelink, esp0, ss0, esp1, ss1, esp2, ss2
+    0,  (uint32_t)task1_dpl0_stack + 4*1024, KERNEL_DATA_SEG,
+    0x0, 0x0, 0x0, 0x0,
+    
+    // cr3, eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi
+    (uint32_t)pg_dir,  (uint32_t)task_1, 0x202,
+    0xa, 0xc, 0xd, 0xb,
+    (uint32_t)task1_dpl3_stack + 4*1024,        // 用户栈
+    0x1, 0x2, 0x3,
+    
+    // es, cs, ss, ds, fs, gs, ldt, iomap
+    APP_DATA_SEG, APP_CODE_SEG, APP_DATA_SEG,
+    APP_DATA_SEG, APP_DATA_SEG, APP_DATA_SEG,
+    0x0, 0x0,
+};
+
 
 void irq0_handler(void);
 
@@ -71,4 +155,13 @@ void os_init(void){
     pg_table[MAP_PHY_ADDR >> 12 & 0x3FF] = (uint32_t)map_phy_buffer | PDE_P | PDE_W | PDE_U;
 
     outb(0xFE, 0x21); // 取消中断屏蔽，打开时钟中断IRQ0
+
+    // 初始化TSS描述符的基址
+    gdt_table[TASK0_TSS_SEL / 8].base_l = (uint16_t)((uint32_t)task0_tss & 0xFFFF);
+    gdt_table[TASK0_TSS_SEL / 8].basehl_attr |= ((uint32_t)os_init >> 16) & 0xFF;
+    gdt_table[TASK0_TSS_SEL / 8].base_limit |= ((uint32_t)task0_tss >> 24) << 24;
+    
+    gdt_table[TASK1_TSS_SEL / 8].base_l = (uint16_t)((uint32_t)task1_tss & 0xFFFF);
+    gdt_table[TASK1_TSS_SEL / 8].basehl_attr |= ((uint32_t)task1_tss >> 16) & 0xFF;
+    gdt_table[TASK1_TSS_SEL / 8].base_limit |= ((uint32_t)task1_tss >> 24) << 24;
 }
