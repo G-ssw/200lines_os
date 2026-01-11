@@ -10,7 +10,7 @@
 	#include "os.h"
 
 	// 声明本地以下符号是全局的，在其它源文件中可以访问
-	.global _start, irq0_handler
+	.global _start, irq0_handler, syscall_handler, task_sched
 
 	// 当需要引用外部的符号是，使用extern声明。相当于C语言中的extern
 	.extern gdt_table, pg_dir, idt_table, os_init, task_0
@@ -88,6 +88,23 @@ start_32:
 	push $task_0_entry
 	iret              // 通过iret指令跳转到任务0入口点
 
+
+syscall_handler:
+	push %ds
+	pusha
+	mov $KERNEL_DATA_SEG, %ax
+	mov %ax, %ds
+	
+	mov %esp, %ebp
+	push 13*4(%ebp) // color
+	push 12*4(%ebp) // str
+	push 11*4(%ebp) // id
+	call do_syscall
+	add $(3*4), %esp
+
+	popa
+	pop %ds
+	retf $(3*4)
 
 task_0_entry:
 	mov %ss, %ax

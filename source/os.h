@@ -19,4 +19,6 @@
 #define TASK0_TSS_SEL   0x28
 #define TASK1_TSS_SEL   0x30
 
+#define SYSCALL_SEL     0x38
+
 #endif // OS_H

@@ -44,6 +44,8 @@ struct {uint16_t limit_l, base_l, basehl_attr, base_limit;}gdt_table[256] __attr
 
     [TASK0_TSS_SEL / 8]   = {0x0068, 0, 0xE900, 0x0},  
     [TASK1_TSS_SEL / 8]   = {0x0068, 0, 0xE900, 0x0},
+
+    [SYSCALL_SEL / 8]     = {0x0000, KERNEL_CODE_SEG, 0xec03, 0x0000},
 };
 
 void outb(uint8_t val, uint16_t port){
@@ -54,9 +56,35 @@ void outb(uint8_t val, uint16_t port){
     );
 }
 
+void do_syscall(int func, char *str, char color){
+    static int row = 1;
+
+    if (func == 2){
+        unsigned short *vram = (unsigned short *)0xB8000 + (row * 80 );
+        while (*str){
+            *vram++ = (color << 8) | *str++;
+        }
+
+        row = (row + 1) % 25;
+        
+        for(int i = 0; i < 0xFFFFF; i++); // 简单延时
+    }
+}
+
+void sys_show(char *str, char color){
+    const unsigned long sys_gate_addr[] = {0, SYSCALL_SEL};
+    __asm__ __volatile__ (
+        "push %[color];push %[str];push %[id];lcalll *(%[gate])"
+        :
+        : [gate]"r"(&sys_gate_addr), [id]"r"(2), [str]"m"(str), [color]"m"(color)
+    );
+}
+
 void task_0 (void) {
     uint8_t color = 0;
+    char *str = "task_0 : running...\n";
     for (;;) {
+        sys_show(str, color);
         color++;
     }
 }
@@ -64,8 +92,9 @@ void task_0 (void) {
 // 任务1函数（任务0已经有了）
 void task_1(void) {
     uint8_t color = 0xff;
-
+    char *str = "task_1 : running...\n";
     for (;;) {
+        sys_show(str, color);
         color--;
     }
 }
@@ -127,7 +156,7 @@ uint32_t task1_tss[] = {
 
 
 void irq0_handler(void);
-
+void syscall_handler (void);
 void os_init(void){
     outb(0x11, 0x20); // 主片
     outb(0x11, 0xA0); // 从片
@@ -164,4 +193,6 @@ void os_init(void){
     gdt_table[TASK1_TSS_SEL / 8].base_l = (uint16_t)((uint32_t)task1_tss & 0xFFFF);
     gdt_table[TASK1_TSS_SEL / 8].basehl_attr |= ((uint32_t)task1_tss >> 16) & 0xFF;
     gdt_table[TASK1_TSS_SEL / 8].base_limit |= ((uint32_t)task1_tss >> 24) << 24;
+
+    gdt_table[SYSCALL_SEL / 8].limit_l = (uint16_t)(uint32_t)syscall_handler;
 }
