@@ -1,0 +1,8 @@
+D:/Git/diy_x86Linux/build/CMakeFiles/edit_cache.dir
+D:/Git/diy_x86Linux/build/CMakeFiles/rebuild_cache.dir
+D:/Git/diy_x86Linux/build/source/boot/CMakeFiles/boot.dir
+D:/Git/diy_x86Linux/build/source/boot/CMakeFiles/edit_cache.dir
+D:/Git/diy_x86Linux/build/source/boot/CMakeFiles/rebuild_cache.dir
+D:/Git/diy_x86Linux/build/source/loader/CMakeFiles/loader.dir
+D:/Git/diy_x86Linux/build/source/loader/CMakeFiles/edit_cache.dir
+D:/Git/diy_x86Linux/build/source/loader/CMakeFiles/rebuild_cache.dir

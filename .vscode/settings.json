@@ -10,4 +10,8 @@
         "fcntl.h": "c",
         "_default_fcntl.h": "c"
     },
+    "workbench.editorAssociations": {
+    "*.hex": "hexEditor.hexedit",
+    "*.ini": "hexEditor.hexedit"
+    },
 }
