@@ -7,13 +7,13 @@ start address 0x00007c00
 
 Program Header:
     LOAD off    0x00000000 vaddr 0x00007000 paddr 0x00007000 align 2**12
-         filesz 0x00000c4c memsz 0x00000c4c flags r-x
+         filesz 0x00000c46 memsz 0x00000c46 flags r-x
     LOAD off    0x00000dfe vaddr 0x00007dfe paddr 0x00007dfe align 2**12
          filesz 0x00000002 memsz 0x00000002 flags r-x
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         0000004c  00007c00  00007c00  00000c00  2**0
+  0 .text         00000046  00007c00  00007c00  00000c00  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   1 boot_end      00000002  00007dfe  00007dfe  00000dfe  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
@@ -25,11 +25,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   5 .debug_abbrev 00000061  00000000  00000000  00000f1d  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_line   000000c3  00000000  00000000  00000f7e  2**0
+  6 .debug_line   000000c0  00000000  00000000  00000f7e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_frame  00000034  00000000  00000000  00001044  2**2
+  7 .debug_frame  00000034  00000000  00000000  00001040  2**2
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_str    000000dd  00000000  00000000  00001078  2**0
+  8 .debug_str    000000da  00000000  00000000  00001074  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 00007c00 l    d  .text	00000000 .text
@@ -42,14 +42,14 @@ SYMBOL TABLE:
 00000000 l    d  .debug_frame	00000000 .debug_frame
 00000000 l    d  .debug_str	00000000 .debug_str
 00000000 l    df *ABS*	00000000 CMakeFiles/boot.dir/start.S.obj
-00007c16 l       .text	00000000 read_loader
+00007c10 l       .text	00000000 read_loader
 00007dfe l       boot_end	00000000 boot_sig
 00000000 l    df *ABS*	00000000 boot.c
-00007c2d g     F .text	0000001f boot_entry
+00007c27 g     F .text	0000001f boot_entry
 00007c00 g       .text	00000000 _start
-00008c4c g       .text	00000000 __bss_start
-00008c4c g       .text	00000000 _edata
-00008c4c g       .text	00000000 _end
+00008c46 g       .text	00000000 __bss_start
+00008c46 g       .text	00000000 _edata
+00008c48 g       .text	00000000 _end
 
 
 
@@ -77,61 +77,54 @@ _start:
 	mov $_start , %sp
     7c0d:	bc 00 7c             	mov    $0x7c00,%sp
 
-	// 显示欢迎信息
-	mov $0xE, %ah
-    7c10:	b4 0e                	mov    $0xe,%ah
-	mov $'H', %al
-    7c12:	b0 48                	mov    $0x48,%al
-	int $0x10
-    7c14:	cd 10                	int    $0x10
+00007c10 <read_loader>:
 
-00007c16 <read_loader>:
 
 read_loader:
 	// 读取二级引导程序到内存地址0x8000处
 	mov $0x8000, %bx       // 读入地址
-    7c16:	bb 00 80             	mov    $0x8000,%bx
+    7c10:	bb 00 80             	mov    $0x8000,%bx
 	mov $0x2, %ah          // 读扇区功能号
-    7c19:	b4 02                	mov    $0x2,%ah
+    7c13:	b4 02                	mov    $0x2,%ah
 	mov $0x64, %al          // 读1个扇区
-    7c1b:	b0 64                	mov    $0x64,%al
+    7c15:	b0 64                	mov    $0x64,%al
 	mov $0x0, %ch          // 柱面号0
-    7c1d:	b5 00                	mov    $0x0,%ch
+    7c17:	b5 00                	mov    $0x0,%ch
 	mov $0x2, %cl          // 起始扇区号1
-    7c1f:	b1 02                	mov    $0x2,%cl
+    7c19:	b1 02                	mov    $0x2,%cl
 	mov $0x0080, %dx       // 磁头号0 + 驱动器号0x80
-    7c21:	ba 80 00             	mov    $0x80,%dx
+    7c1b:	ba 80 00             	mov    $0x80,%dx
 	int $0x13              // 调用BIOS中断
-    7c24:	cd 13                	int    $0x13
+    7c1e:	cd 13                	int    $0x13
 	jc read_loader		   // 读失败则重试
-    7c26:	72 ee                	jb     7c16 <read_loader>
+    7c20:	72 ee                	jb     7c10 <read_loader>
 
 	jmp boot_entry
-    7c28:	e9 02 00             	jmp    7c2d <boot_entry>
+    7c22:	e9 02 00             	jmp    7c27 <boot_entry>
 
 	jmp .
-    7c2b:	eb fe                	jmp    7c2b <read_loader+0x15>
+    7c25:	eb fe                	jmp    7c25 <read_loader+0x15>
 
-00007c2d <boot_entry>:
+00007c27 <boot_entry>:
 
 /**
  * Boot的C入口函数
  * 只完成一项功能，即从磁盘找到loader文件然后加载到内容中，并跳转过去
  */
 void boot_entry(void) {
-    7c2d:	66 55                	push   %ebp
-    7c2f:	66 89 e5             	mov    %esp,%ebp
-    7c32:	66 83 ec 18          	sub    $0x18,%esp
+    7c27:	66 55                	push   %ebp
+    7c29:	66 89 e5             	mov    %esp,%ebp
+    7c2c:	66 83 ec 18          	sub    $0x18,%esp
     void (*loader_entry)(void) = (void (*)(void))LOADER_START_ADDR;
-    7c36:	67 66 c7 45 f4 00 80 	movl   $0x8000,-0xc(%ebp)
-    7c3d:	00 00 
+    7c30:	67 66 c7 45 f4 00 80 	movl   $0x8000,-0xc(%ebp)
+    7c37:	00 00 
     loader_entry();
-    7c3f:	67 66 8b 45 f4       	mov    -0xc(%ebp),%eax
-    7c44:	66 ff d0             	calll  *%eax
+    7c39:	67 66 8b 45 f4       	mov    -0xc(%ebp),%eax
+    7c3e:	66 ff d0             	calll  *%eax
 } 
-    7c47:	90                   	nop
-    7c48:	66 c9                	leavel 
-    7c4a:	66 c3                	retl   
+    7c41:	90                   	nop
+    7c42:	66 c9                	leavel 
+    7c44:	66 c3                	retl   
 
 Disassembly of section boot_end:
 

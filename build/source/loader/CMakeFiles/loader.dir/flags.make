@@ -7,11 +7,11 @@ ASM_DEFINES =
 
 ASM_INCLUDES = @CMakeFiles/loader.dir/includes_ASM.rsp
 
-ASM_FLAGS = -m32 -g -g
+ASM_FLAGS = -m32 -g
 
 C_DEFINES = 
 
 C_INCLUDES = @CMakeFiles/loader.dir/includes_C.rsp
 
-C_FLAGS = -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -g
+C_FLAGS = -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables
 

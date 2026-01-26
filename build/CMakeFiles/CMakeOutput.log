@@ -15,15 +15,15 @@ The C compiler identification is GNU, found in "D:/Git/diy_x86Linux/build/CMakeF
 Determining if the C compiler works passed with the following output:
 Change Dir: D:/Git/diy_x86Linux/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/x86_64-elf-tools-windows/bin/make.exe -f Makefile cmTC_12993/fast && C:/x86_64-elf-tools-windows/bin/make.exe  -f CMakeFiles/cmTC_12993.dir/build.make CMakeFiles/cmTC_12993.dir/build
+Run Build Command(s):C:/x86_64-elf-tools-windows/bin/make.exe -f Makefile cmTC_89bce/fast && C:/x86_64-elf-tools-windows/bin/make.exe  -f CMakeFiles/cmTC_89bce.dir/build.make CMakeFiles/cmTC_89bce.dir/build
 make[1]: Entering directory 'D:/Git/diy_x86Linux/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_12993.dir/testCCompiler.c.obj
-C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe   -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables  -o CMakeFiles/cmTC_12993.dir/testCCompiler.c.obj -c D:/Git/diy_x86Linux/build/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_12993.exe
-"C:/Program Files (x86)/CMake/bin/cmake.exe" -E rm -f CMakeFiles/cmTC_12993.dir/objects.a
-C:/x86_64-elf-tools-windows/bin/x86_64-elf-ar.exe qc CMakeFiles/cmTC_12993.dir/objects.a @CMakeFiles/cmTC_12993.dir/objects1.rsp
-C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables  -Wl,--whole-archive CMakeFiles/cmTC_12993.dir/objects.a -Wl,--no-whole-archive -o cmTC_12993.exe -Wl,--out-implib,libcmTC_12993.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_12993.dir/linklibs.rsp
-x86_64-elf-gcc.exe: warning: CMakeFiles/cmTC_12993.dir/objects.a: linker input file unused because linking not done
+Building C object CMakeFiles/cmTC_89bce.dir/testCCompiler.c.obj
+C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe   -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables  -o CMakeFiles/cmTC_89bce.dir/testCCompiler.c.obj -c D:/Git/diy_x86Linux/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_89bce.exe
+"C:/Program Files (x86)/CMake/bin/cmake.exe" -E rm -f CMakeFiles/cmTC_89bce.dir/objects.a
+C:/x86_64-elf-tools-windows/bin/x86_64-elf-ar.exe qc CMakeFiles/cmTC_89bce.dir/objects.a @CMakeFiles/cmTC_89bce.dir/objects1.rsp
+C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables  -Wl,--whole-archive CMakeFiles/cmTC_89bce.dir/objects.a -Wl,--no-whole-archive -o cmTC_89bce.exe -Wl,--out-implib,libcmTC_89bce.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/cmTC_89bce.dir/linklibs.rsp
+x86_64-elf-gcc.exe: warning: CMakeFiles/cmTC_89bce.dir/objects.a: linker input file unused because linking not done
 make[1]: Leaving directory 'D:/Git/diy_x86Linux/build/CMakeFiles/CMakeTmp'
 
 

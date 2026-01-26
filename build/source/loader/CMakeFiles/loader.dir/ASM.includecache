@@ -6,9 +6,5 @@
 
 #IncludeRegexTransform: 
 
-D:/Git/diy_x86Linux/source/loader/loader.h
-
 D:/Git/diy_x86Linux/source/loader/start.S
-loader.h
-D:/Git/diy_x86Linux/source/loader/loader.h
 

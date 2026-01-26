@@ -26,10 +26,6 @@ _start:
 	// 设置堆栈指针
 	mov $_start , %sp
 
-	// 显示欢迎信息
-	mov $0xE, %ah
-	mov $'H', %al
-	int $0x10
 
 read_loader:
 	// 读取二级引导程序到内存地址0x8000处
