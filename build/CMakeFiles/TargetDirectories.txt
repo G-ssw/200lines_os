@@ -6,3 +6,6 @@ D:/Git/diy_x86Linux/build/source/boot/CMakeFiles/rebuild_cache.dir
 D:/Git/diy_x86Linux/build/source/loader/CMakeFiles/loader.dir
 D:/Git/diy_x86Linux/build/source/loader/CMakeFiles/edit_cache.dir
 D:/Git/diy_x86Linux/build/source/loader/CMakeFiles/rebuild_cache.dir
+D:/Git/diy_x86Linux/build/source/kernel/CMakeFiles/kernel.dir
+D:/Git/diy_x86Linux/build/source/kernel/CMakeFiles/edit_cache.dir
+D:/Git/diy_x86Linux/build/source/kernel/CMakeFiles/rebuild_cache.dir

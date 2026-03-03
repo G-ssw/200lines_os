@@ -8,7 +8,7 @@ __asm__(".code16gcc");
 
 #include "loader.h"
 
-static boot_info_t boot_info;
+boot_info_t boot_info;
 
 static void show_msg(const char* msg){
     char c;
@@ -24,6 +24,10 @@ static void show_msg(const char* msg){
     }
 }
 
+/*
+ * 内存检测，使用BIOS提供的0xE820接口获取内存信息
+ * 将可用内存区域的信息保存到boot_info中，供内核使用
+*/
 static void detect_memory(void){
     uint32_t contID = 0;
     uint32_t signature, bytes;

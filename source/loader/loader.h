@@ -5,6 +5,11 @@
 #include "comm/boot_info.h"
 #include "comm/cpu_instr.h"
 
+#define SYS_KERNEL_LOAD_ADDR (1024*1024) // 内核加载地址，1MB
+#define SECTOR_SIZE 512
+
+extern boot_info_t boot_info;
+
 // 保护模式入口函数，在loader_protect.S中实现
 void protect_mode_entry (void);
 

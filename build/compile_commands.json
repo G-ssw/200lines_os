@@ -23,5 +23,15 @@
   "directory": "D:/Git/diy_x86Linux/build/source/loader",
   "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/loader.dir/includes_C.rsp -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -g -o CMakeFiles/loader.dir/loader_32.c.obj -c D:/Git/diy_x86Linux/source/loader/loader_32.c",
   "file": "D:/Git/diy_x86Linux/source/loader/loader_32.c"
+},
+{
+  "directory": "D:/Git/diy_x86Linux/build/source/kernel",
+  "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_ASM.rsp -m32 -g -g -o CMakeFiles/kernel.dir/init/start.s.obj -c D:/Git/diy_x86Linux/source/kernel/init/start.s",
+  "file": "D:/Git/diy_x86Linux/source/kernel/init/start.s"
+},
+{
+  "directory": "D:/Git/diy_x86Linux/build/source/kernel",
+  "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_C.rsp -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -g -o CMakeFiles/kernel.dir/init/init.c.obj -c D:/Git/diy_x86Linux/source/kernel/init/init.c",
+  "file": "D:/Git/diy_x86Linux/source/kernel/init/init.c"
 }
 ]

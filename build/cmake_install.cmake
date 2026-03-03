@@ -41,6 +41,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("D:/Git/diy_x86Linux/build/source/boot/cmake_install.cmake")
   include("D:/Git/diy_x86Linux/build/source/loader/cmake_install.cmake")
+  include("D:/Git/diy_x86Linux/build/source/kernel/cmake_install.cmake")
 
 endif()
 
