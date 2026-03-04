@@ -3,7 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/kernel.dir/cpu/cpu.c.obj.d"
   "CMakeFiles/kernel.dir/init/init.c.obj"
   "CMakeFiles/kernel.dir/init/init.c.obj.d"
-  "CMakeFiles/kernel.dir/init/start.s.obj"
+  "CMakeFiles/kernel.dir/init/start.S.obj"
   "kernel.exe"
   "kernel.exe.manifest"
   "kernel.pdb"

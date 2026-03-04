@@ -178,13 +178,13 @@ init/init.c.s:
 	cd D:/Git/diy_x86Linux/build && $(MAKE) $(MAKESILENT) -f source/kernel/CMakeFiles/kernel.dir/build.make source/kernel/CMakeFiles/kernel.dir/init/init.c.s
 .PHONY : init/init.c.s
 
-init/start.obj: init/start.s.obj
+init/start.obj: init/start.S.obj
 .PHONY : init/start.obj
 
 # target to build an object file
-init/start.s.obj:
-	cd D:/Git/diy_x86Linux/build && $(MAKE) $(MAKESILENT) -f source/kernel/CMakeFiles/kernel.dir/build.make source/kernel/CMakeFiles/kernel.dir/init/start.s.obj
-.PHONY : init/start.s.obj
+init/start.S.obj:
+	cd D:/Git/diy_x86Linux/build && $(MAKE) $(MAKESILENT) -f source/kernel/CMakeFiles/kernel.dir/build.make source/kernel/CMakeFiles/kernel.dir/init/start.S.obj
+.PHONY : init/start.S.obj
 
 # Help Target
 help:

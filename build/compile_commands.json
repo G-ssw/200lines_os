@@ -26,8 +26,13 @@
 },
 {
   "directory": "D:/Git/diy_x86Linux/build/source/kernel",
-  "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_ASM.rsp -m32 -g -g -o CMakeFiles/kernel.dir/init/start.s.obj -c D:/Git/diy_x86Linux/source/kernel/init/start.s",
-  "file": "D:/Git/diy_x86Linux/source/kernel/init/start.s"
+  "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_ASM.rsp -m32 -g -g -o CMakeFiles/kernel.dir/init/start.S.obj -c D:/Git/diy_x86Linux/source/kernel/init/start.S",
+  "file": "D:/Git/diy_x86Linux/source/kernel/init/start.S"
+},
+{
+  "directory": "D:/Git/diy_x86Linux/build/source/kernel",
+  "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_C.rsp -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -g -o CMakeFiles/kernel.dir/cpu/cpu.c.obj -c D:/Git/diy_x86Linux/source/kernel/cpu/cpu.c",
+  "file": "D:/Git/diy_x86Linux/source/kernel/cpu/cpu.c"
 },
 {
   "directory": "D:/Git/diy_x86Linux/build/source/kernel",

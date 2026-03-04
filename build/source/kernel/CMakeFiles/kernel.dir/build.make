@@ -69,19 +69,19 @@ include source/kernel/CMakeFiles/kernel.dir/progress.make
 # Include the compile flags for this target's objects.
 include source/kernel/CMakeFiles/kernel.dir/flags.make
 
-source/kernel/CMakeFiles/kernel.dir/init/start.s.obj: source/kernel/CMakeFiles/kernel.dir/flags.make
-source/kernel/CMakeFiles/kernel.dir/init/start.s.obj: source/kernel/CMakeFiles/kernel.dir/includes_ASM.rsp
-source/kernel/CMakeFiles/kernel.dir/init/start.s.obj: ../source/kernel/init/start.s
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=D:/Git/diy_x86Linux/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building ASM object source/kernel/CMakeFiles/kernel.dir/init/start.s.obj"
-	cd D:/Git/diy_x86Linux/build/source/kernel && C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -o CMakeFiles/kernel.dir/init/start.s.obj -c D:/Git/diy_x86Linux/source/kernel/init/start.s
+source/kernel/CMakeFiles/kernel.dir/init/start.S.obj: source/kernel/CMakeFiles/kernel.dir/flags.make
+source/kernel/CMakeFiles/kernel.dir/init/start.S.obj: source/kernel/CMakeFiles/kernel.dir/includes_ASM.rsp
+source/kernel/CMakeFiles/kernel.dir/init/start.S.obj: ../source/kernel/init/start.S
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=D:/Git/diy_x86Linux/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building ASM object source/kernel/CMakeFiles/kernel.dir/init/start.S.obj"
+	cd D:/Git/diy_x86Linux/build/source/kernel && C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -o CMakeFiles/kernel.dir/init/start.S.obj -c D:/Git/diy_x86Linux/source/kernel/init/start.S
 
-source/kernel/CMakeFiles/kernel.dir/init/start.s.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing ASM source to CMakeFiles/kernel.dir/init/start.s.i"
-	cd D:/Git/diy_x86Linux/build/source/kernel && C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -E D:/Git/diy_x86Linux/source/kernel/init/start.s > CMakeFiles/kernel.dir/init/start.s.i
+source/kernel/CMakeFiles/kernel.dir/init/start.S.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing ASM source to CMakeFiles/kernel.dir/init/start.S.i"
+	cd D:/Git/diy_x86Linux/build/source/kernel && C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -E D:/Git/diy_x86Linux/source/kernel/init/start.S > CMakeFiles/kernel.dir/init/start.S.i
 
-source/kernel/CMakeFiles/kernel.dir/init/start.s.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling ASM source to assembly CMakeFiles/kernel.dir/init/start.s.s"
-	cd D:/Git/diy_x86Linux/build/source/kernel && C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -S D:/Git/diy_x86Linux/source/kernel/init/start.s -o CMakeFiles/kernel.dir/init/start.s.s
+source/kernel/CMakeFiles/kernel.dir/init/start.S.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling ASM source to assembly CMakeFiles/kernel.dir/init/start.S.s"
+	cd D:/Git/diy_x86Linux/build/source/kernel && C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -S D:/Git/diy_x86Linux/source/kernel/init/start.S -o CMakeFiles/kernel.dir/init/start.S.s
 
 source/kernel/CMakeFiles/kernel.dir/cpu/cpu.c.obj: source/kernel/CMakeFiles/kernel.dir/flags.make
 source/kernel/CMakeFiles/kernel.dir/cpu/cpu.c.obj: source/kernel/CMakeFiles/kernel.dir/includes_C.rsp
@@ -115,14 +115,14 @@ source/kernel/CMakeFiles/kernel.dir/init/init.c.s: cmake_force
 
 # Object files for target kernel
 kernel_OBJECTS = \
-"CMakeFiles/kernel.dir/init/start.s.obj" \
+"CMakeFiles/kernel.dir/init/start.S.obj" \
 "CMakeFiles/kernel.dir/cpu/cpu.c.obj" \
 "CMakeFiles/kernel.dir/init/init.c.obj"
 
 # External object files for target kernel
 kernel_EXTERNAL_OBJECTS =
 
-source/kernel/kernel.exe: source/kernel/CMakeFiles/kernel.dir/init/start.s.obj
+source/kernel/kernel.exe: source/kernel/CMakeFiles/kernel.dir/init/start.S.obj
 source/kernel/kernel.exe: source/kernel/CMakeFiles/kernel.dir/cpu/cpu.c.obj
 source/kernel/kernel.exe: source/kernel/CMakeFiles/kernel.dir/init/init.c.obj
 source/kernel/kernel.exe: source/kernel/CMakeFiles/kernel.dir/build.make

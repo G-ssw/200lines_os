@@ -6,5 +6,9 @@
 
 #IncludeRegexTransform: 
 
-D:/Git/diy_x86Linux/source/kernel/init/start.s
+../source/kernel/include/os_cfg.h
+
+D:/Git/diy_x86Linux/source/kernel/init/start.S
+os_cfg.h
+D:/Git/diy_x86Linux/source/kernel/init/os_cfg.h
 
