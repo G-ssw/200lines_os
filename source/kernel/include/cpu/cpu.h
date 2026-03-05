@@ -14,7 +14,14 @@
 #define SEG_TYPE_DATA		(0 << 3)
 #define SEG_TYPE_RW			(1 << 1)
 
+
+#define GATE_TYPE_IDT		(0xE << 8)		// 中断32位门描述符
+#define GATE_P_PRESENT		(1 << 15)		// 是否存在
+#define GATE_DPL0			(0 << 13)		// 特权级0，最高特权级
+#define GATE_DPL3			(3 << 13)		// 特权级3，最低权限
+
 #pragma pack(1)
+/********** 全局描述符 **********/
 typedef struct _segment_desc_t {
     uint16_t limit15_0;
     uint16_t base15_0;
@@ -22,6 +29,14 @@ typedef struct _segment_desc_t {
     uint16_t attr;
     uint8_t base31_24;
 } segment_desc_t;
+
+/********** 中断门描述符 **********/
+typedef struct _gate_desc_t {
+	uint16_t offset15_0;
+	uint16_t selector;
+	uint16_t attr;
+	uint16_t offset31_16;
+}gate_desc_t;
 #pragma pack()
 
 // ---------- 用于构造 16 位 attr 值 ----------
@@ -46,5 +61,5 @@ typedef struct _segment_desc_t {
 // 函数声明
 void cpu_init(void);
 void segment_desc_set(uint16_t selector, uint32_t base, uint32_t limit, uint8_t type, uint8_t flags);
-
+void gate_desc_set(uint8_t vector, uint16_t selector_cs, uint32_t offset, uint16_t attr);
 #endif

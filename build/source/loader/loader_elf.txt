@@ -30,10 +30,10 @@ Section Headers:
   [ 6] .debug_aranges    PROGBITS        00000000 0016a0 000060 00      0   0  8
   [ 7] .debug_info       PROGBITS        00000000 001700 0008d9 00      0   0  1
   [ 8] .debug_abbrev     PROGBITS        00000000 001fd9 000339 00      0   0  1
-  [ 9] .debug_line       PROGBITS        00000000 002312 0002ec 00      0   0  1
-  [10] .debug_frame      PROGBITS        00000000 002600 000268 00      0   0  4
-  [11] .debug_str        PROGBITS        00000000 002868 0003f5 01  MS  0   0  1
-  [12] .debug_ranges     PROGBITS        00000000 002c5d 000018 00      0   0  1
+  [ 9] .debug_line       PROGBITS        00000000 002312 0002ef 00      0   0  1
+  [10] .debug_frame      PROGBITS        00000000 002604 000268 00      0   0  4
+  [11] .debug_str        PROGBITS        00000000 00286c 0003f2 01  MS  0   0  1
+  [12] .debug_ranges     PROGBITS        00000000 002c5e 000018 00      0   0  1
   [13] .symtab           SYMTAB          00000000 002c78 000280 10     14  31  4
   [14] .strtab           STRTAB          00000000 002ef8 0000eb 00      0   0  1
   [15] .shstrtab         STRTAB          00000000 002fe3 000098 00      0   0  1
