@@ -1,7 +1,7 @@
 #include "cpu/cpu.h"
 #include "os_cfg.h"
 #include "comm/cpu_instr.h"
-#include "cpu/irq.h"
+#include "dev/timer.h"
 
 static segment_desc_t gdt_table[GDT_TABLE_SIZE]; // 全局描述符表
 static gate_desc_t idt_table[IDT_TABLE_SIZE]; // 中断描述符表
@@ -67,6 +67,74 @@ void irq_install(int irq_num, irq_handler_t handler) {
                   GATE_P_PRESENT | GATE_DPL0 | GATE_TYPE_IDT);
 }
 
+void init_pic(void) {
+    // 边缘触发，级联，需要配置icw4, 8086模式
+    outb(PIC0_ICW1, PIC_ICW1_ALWAYS_1 | PIC_ICW1_ICW4);
+
+    // 对应的中断号起始序号0x20
+    outb(PIC0_ICW2, IRQ_PIC_START);
+
+    // 主片IRQ2有从片
+    outb(PIC0_ICW3, 1 << 2);
+
+    // 普通全嵌套、非缓冲、非自动结束、8086模式
+    outb(PIC0_ICW4, PIC_ICW4_8086);
+
+    // 边缘触发，级联，需要配置icw4, 8086模式
+    outb(PIC1_ICW1, PIC_ICW1_ICW4 | PIC_ICW1_ALWAYS_1);
+
+    // 起始中断序号，要加上8
+    outb(PIC1_ICW2, IRQ_PIC_START + 8);
+
+    // 没有从片，连接到主片的IRQ2上
+    outb(PIC1_ICW3, 2);
+
+    // 普通全嵌套、非缓冲、非自动结束、8086模式
+    outb(PIC1_ICW4, PIC_ICW4_8086);
+
+    // 禁止所有中断, 允许从PIC1传来的中断
+    outb(PIC0_IMR, 0xFF & ~(1 << 2));
+    outb(PIC1_IMR, 0xFF);
+}
+
+void irq_enable(int irq_num) {
+    if (irq_num < IRQ_PIC_START || irq_num >= IDT_TABLE_SIZE) {
+        return; // 无效的中断号
+    }
+    irq_num -= IRQ_PIC_START; // 调整为PIC的IRQ号
+    if (irq_num < 8) {
+        uint8_t mask = inb(PIC0_IMR) & ~(1 << irq_num);
+        outb(PIC0_IMR, mask);
+    }else {
+        irq_num -= 8; // 调整为从片的IRQ号
+        uint8_t mask = inb(PIC1_IMR) & ~(1 << (irq_num - 8));
+        outb(PIC1_IMR, mask);
+    }
+}
+
+void irq_disable(int irq_num) {
+    if (irq_num < IRQ_PIC_START || irq_num >= IDT_TABLE_SIZE) {
+        return; // 无效的中断号
+    }
+    irq_num -= IRQ_PIC_START; // 调整为PIC的IRQ号
+    if (irq_num < 8) {
+        uint8_t mask = inb(PIC0_IMR) | (1 << irq_num);
+        outb(PIC0_IMR, mask);
+    } else {
+        irq_num -= 8; // 调整为从片的IRQ号
+        uint8_t mask = inb(PIC1_IMR) | (1 << (irq_num - 8));
+        outb(PIC1_IMR, mask);
+    }
+}
+
+void irq_global_enable() {
+    sti();
+}
+
+void irq_global_disable() {
+    cli();
+}
+
 void irq_init(void) {
     // 将所有 IDT 表项设置为默认的中断处理函数
     for (int i = 0; i < IDT_TABLE_SIZE; i++) {
@@ -97,9 +165,13 @@ void irq_init(void) {
 
     // 加载 IDTR 寄存器
     lidt((uint32_t)idt_table, sizeof(idt_table));
+
+    // 初始化 PIC 控制器
+    init_pic();
 }
 
 void cpu_init(void) {
     init_gdt();
     irq_init();
+    timer_init();
 } 

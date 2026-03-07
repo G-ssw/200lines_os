@@ -3,7 +3,6 @@
 #include "comm/cpu_instr.h"
 #include "os_cfg.h"
 
-
 static void do_default_handler (exception_frame_t * frame,const char * message) {
     for (;;) {hlt();}
 }

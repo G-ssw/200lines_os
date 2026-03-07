@@ -178,6 +178,30 @@ cpu/irq.c.s:
 	cd D:/Git/diy_x86Linux/build && $(MAKE) $(MAKESILENT) -f source/kernel/CMakeFiles/kernel.dir/build.make source/kernel/CMakeFiles/kernel.dir/cpu/irq.c.s
 .PHONY : cpu/irq.c.s
 
+dev/timer.obj: dev/timer.c.obj
+.PHONY : dev/timer.obj
+
+# target to build an object file
+dev/timer.c.obj:
+	cd D:/Git/diy_x86Linux/build && $(MAKE) $(MAKESILENT) -f source/kernel/CMakeFiles/kernel.dir/build.make source/kernel/CMakeFiles/kernel.dir/dev/timer.c.obj
+.PHONY : dev/timer.c.obj
+
+dev/timer.i: dev/timer.c.i
+.PHONY : dev/timer.i
+
+# target to preprocess a source file
+dev/timer.c.i:
+	cd D:/Git/diy_x86Linux/build && $(MAKE) $(MAKESILENT) -f source/kernel/CMakeFiles/kernel.dir/build.make source/kernel/CMakeFiles/kernel.dir/dev/timer.c.i
+.PHONY : dev/timer.c.i
+
+dev/timer.s: dev/timer.c.s
+.PHONY : dev/timer.s
+
+# target to generate assembly for a file
+dev/timer.c.s:
+	cd D:/Git/diy_x86Linux/build && $(MAKE) $(MAKESILENT) -f source/kernel/CMakeFiles/kernel.dir/build.make source/kernel/CMakeFiles/kernel.dir/dev/timer.c.s
+.PHONY : dev/timer.c.s
+
 init/init.obj: init/init.c.obj
 .PHONY : init/init.obj
 
@@ -225,6 +249,9 @@ help:
 	@echo "... cpu/irq.obj"
 	@echo "... cpu/irq.i"
 	@echo "... cpu/irq.s"
+	@echo "... dev/timer.obj"
+	@echo "... dev/timer.i"
+	@echo "... dev/timer.s"
 	@echo "... init/init.obj"
 	@echo "... init/init.i"
 	@echo "... init/init.s"

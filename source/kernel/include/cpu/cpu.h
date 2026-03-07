@@ -2,6 +2,7 @@
 #define CPU_H
 
 #include "comm/types.h"
+#include "cpu/irq.h"
 
 #define SEG_G				(1 << 3)
 #define SEG_D				(1 << 2)
@@ -62,4 +63,9 @@ typedef struct _gate_desc_t {
 void cpu_init(void);
 void segment_desc_set(uint16_t selector, uint32_t base, uint32_t limit, uint8_t type, uint8_t flags);
 void gate_desc_set(uint8_t vector, uint16_t selector_cs, uint32_t offset, uint16_t attr);
+void irq_install(int irq_num, irq_handler_t handler);
+void irq_enable(int irq_num);
+void irq_disable(int irq_num);
+void irq_global_enable();
+void irq_global_disable();
 #endif
