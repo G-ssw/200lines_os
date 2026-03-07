@@ -35,20 +35,30 @@ gdt_reload:
 // 中断发生时，会自动切换到特权级0对应的栈中去执行
 // 并且只保存ss,esp,cs,eip,flags寄存器
 // 所以需要在中断中自行保存其它寄存器
+	.text
+.macro exception_handler name num error_code 
+	.extern do_handler_\name
+	.global exception_handler_\name
+	exception_handler_\name:
 
-    .text
-	.extern do_handler_unknown
-	.global exception_handler_unknown
-exception_handler_unknown:
+	// 如果错误码不存在，为了保证统一的调用方式，仍然压入一个0作为错误码
+	.if \error_code == 0
+		push $\error_code
+	.endif
+
+	// 压入中断号
+	push $\num
+
 	// 保存所有寄存器
-	pusha
+	pushal
 	push %ds
 	push %es
 	push %fs
 	push %gs
 
-	// 调用中断处理函数
-	call do_handler_unknown
+	push %esp // 将用户栈指针压入栈中，供中断处理函数使用
+	call do_handler_\name // 调用中断处理函数
+	pop %esp // 恢复用户栈指针
 
 	// 恢复保存的寄存器
 	pop %gs
@@ -56,4 +66,30 @@ exception_handler_unknown:
 	pop %es
 	pop %ds
 	popa
+
+	// 直接跳过栈中的错误码和中断号，返回到中断发生前的状态
+	add $8, %esp
+
 	iret
+.endm
+
+exception_handler unknown, -1, 0
+exception_handler divider, 0, 0
+exception_handler Debug, 1, 0
+exception_handler NMI, 2, 0
+exception_handler breakpoint, 3, 0
+exception_handler overflow, 4, 0
+exception_handler bound_range, 5, 0
+exception_handler invalid_opcode, 6, 0
+exception_handler device_unavailable, 7, 0
+exception_handler double_fault, 8, 1
+exception_handler invalid_tss, 10, 1
+exception_handler segment_not_present, 11, 1
+exception_handler stack_segment_fault, 12, 1
+exception_handler general_protection, 13, 1
+exception_handler page_fault, 14, 1
+exception_handler fpu_error, 16, 0
+exception_handler alignment_check, 17, 1
+exception_handler machine_check, 18, 0
+exception_handler smd_exception, 19, 0
+exception_handler virtual_exception, 20, 0
