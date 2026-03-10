@@ -32,6 +32,15 @@
             "options": {
                 "cwd": "${workspaceRoot}/image/"
             },
+            // 关键配置：控制任务终端的行为
+            "presentation": {
+                "echo": true,
+                "reveal": "always",      // 总是显示这个任务的终端
+                "focus": true,            // 任务启动后，焦点切换到该终端
+                "panel": "dedicated",     // 为这个任务分配一个专用的终端面板
+                "showReuseMessage": false, // 重点：关闭“终端将被任务重用”的提示
+                "clear": false
+            },
         },
         {
             "label": "调试准备",
@@ -41,5 +50,6 @@
                 "----------------- start qemu(不要点)"
             ],
         }
+        
     ]
 }
