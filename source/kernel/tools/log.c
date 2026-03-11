@@ -37,3 +37,11 @@ void log_printf(const char *format, ...) {
     outb(COM1_PORT, '\n'); // 发送换行符
 
 }
+
+void panic(const char *file, int line, const char *func, const char *cond) {
+    log_printf("\n---------------------------------\n");
+    log_printf("Kernel Panic at %s:%d \nIn function %s: condition '%s' failed.\n", file, line, func, cond);
+    log_printf("---------------------------------\n");
+    for (;;) {hlt();}
+}
+

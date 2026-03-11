@@ -89,7 +89,6 @@ static void reverse(char *s, uint16_t len) {
     }
 }
 
-
 // 辅助函数：将整数转换为字符串（内部使用）
 static uint16_t itoa(char *buf, uint32_t num, int base, int upper) {
     char *p = buf;
@@ -100,6 +99,17 @@ static uint16_t itoa(char *buf, uint32_t num, int base, int upper) {
     } while (num);
     reverse(buf, p - buf);
     return p - buf;
+}
+
+/**
+ * @brief 格式化字符串到缓存中
+ */
+void kernel_sprintf(char * buffer, const char * fmt, ...) {
+    va_list args;
+
+    va_start(args, fmt);
+    kernel_vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
 }
 
 /**
@@ -120,100 +130,132 @@ int kernel_vsnprintf(char *buffer, uint16_t size, const char *fmt, va_list args)
         if (state == NORMAL) {
             if (ch == '%') {
                 state = READ_FMT;
+                // ========== 开始解析格式说明符 ==========
+                int width = 0;
+                int zero_pad = 0;
+
+                // 解析 '0' 标志和宽度数字
+                while (1) {
+                    if (*fmt == '0') {
+                        zero_pad = 1;
+                        fmt++;
+                    } else if (*fmt >= '1' && *fmt <= '9') {
+                        width = 0;
+                        while (*fmt >= '0' && *fmt <= '9') {
+                            width = width * 10 + (*fmt - '0');
+                            fmt++;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                ch = *fmt++;   // 取出类型字符，并移动 fmt 到其后
+                state = NORMAL; // 格式解析完成，回到普通状态
+                // ========== 根据类型字符处理 ==========
+                uint16_t len = 0;
+                char num_buf[32];
+
+                switch (ch) {
+                    case 's': {
+                        const char *str = va_arg(args, const char *);
+                        while (*str) {
+                            if (remain > 1) {
+                                *curr++ = *str;
+                                remain--;
+                            }
+                            str++;
+                            len++;
+                        }
+                        break;
+                    }
+                    case 'c': {
+                        char c = (char)va_arg(args, int);
+                        if (remain > 1) {
+                            *curr++ = c;
+                            remain--;
+                        }
+                        len = 1;
+                        break;
+                    }
+                    case 'd': {
+                        int num = va_arg(args, int);
+                        uint32_t u;
+                        uint16_t prefix_len = 0;
+                        if (num < 0) {
+                            if (remain > 1) {
+                                *curr++ = '-';
+                                remain--;
+                            }
+                            prefix_len = 1;
+                            u = -num;
+                        } else {
+                            u = num;
+                        }
+                        uint16_t num_len = itoa(num_buf, u, 10, 0);
+                        for (uint16_t i = 0; i < num_len; i++) {
+                            if (remain > 1) {
+                                *curr++ = num_buf[i];
+                                remain--;
+                            }
+                        }
+                        len = prefix_len + num_len;
+                        break;
+                    }
+                    case 'x':
+                    case 'X': {
+                        unsigned int num = va_arg(args, unsigned int);
+                        uint16_t num_len = itoa(num_buf, num, 16, (ch == 'X'));
+                        uint16_t padding = 0;
+                        if (zero_pad && width > num_len) {
+                            padding = width - num_len;
+                        }
+                        // 先输出填充的零
+                        for (uint16_t i = 0; i < padding; i++) {
+                            if (remain > 1) {
+                                *curr++ = '0';
+                                remain--;
+                            }
+                        }
+                        // 再输出数字
+                        for (uint16_t i = 0; i < num_len; i++) {
+                            if (remain > 1) {
+                                *curr++ = num_buf[i];
+                                remain--;
+                            }
+                        }
+                        len = num_len + padding;
+                        break;
+                    }
+                    case '%': {
+                        if (remain > 1) {
+                            *curr++ = '%';
+                            remain--;
+                        }
+                        len = 1;
+                        break;
+                    }
+                    default:
+                        // 不认识的格式符，直接输出 '%' 和该字符
+                        if (remain > 1) {
+                            *curr++ = '%';
+                            remain--;
+                        }
+                        len++;
+                        if (remain > 1) {
+                            *curr++ = ch;
+                            remain--;
+                        }
+                        len++;
+                        break;
+                }
+                // 各分支已正确设置 len，无需额外操作
             } else {
-                if (remain > 1) {   // 留一个位置给结尾'\0'
+                // 普通字符直接复制
+                if (remain > 1) {
                     *curr++ = ch;
                     remain--;
                 }
-                // 即使缓冲区满，仍需继续计数，以便返回总长度
             }
-        } else { // state == READ_FMT
-            state = NORMAL;          // 默认处理完后回到普通状态
-            uint16_t len = 0;
-            char num_buf[32];        // 临时存放数字转换结果
-
-            switch (ch) {
-                case 's': {
-                    const char *str = va_arg(args, const char *);
-                    while (*str) {
-                        if (remain > 1) {
-                            *curr++ = *str;
-                            remain--;
-                        }
-                        str++;
-                        len++;
-                    }
-                    break;
-                }
-                case 'c': {
-                    char c = (char)va_arg(args, int);
-                    if (remain > 1) {
-                        *curr++ = c;
-                        remain--;
-                    }
-                    len = 1;
-                    break;
-                }
-                case 'd': {
-                    int num = va_arg(args, int);
-                    uint32_t u;
-                    if (num < 0) {
-                        if (remain > 1) {
-                            *curr++ = '-';
-                            remain--;
-                        }
-                        len++;
-                        u = -num;
-                    } else {
-                        u = num;
-                    }
-                    uint16_t num_len = itoa(num_buf, u, 10, 0);
-                    for (uint16_t i = 0; i < num_len; i++) {
-                        if (remain > 1) {
-                            *curr++ = num_buf[i];
-                            remain--;
-                        }
-                        len++;
-                    }
-                    break;
-                }
-                case 'x':
-                case 'X': {
-                    unsigned int num = va_arg(args, unsigned int);
-                    uint16_t num_len = itoa(num_buf, num, 16, (ch == 'X'));
-                    for (uint16_t i = 0; i < num_len; i++) {
-                        if (remain > 1) {
-                            *curr++ = num_buf[i];
-                            remain--;
-                        }
-                        len += num_len;
-                    }
-                    break;
-                }
-                case '%': {
-                    if (remain > 1) {
-                        *curr++ = '%';
-                        remain--;
-                    }
-                    len = 1;
-                    break;
-                }
-                default:
-                    // 不认识的格式符，直接输出原样？或者忽略？这里忽略并回退状态
-                    // 但为了简单，我们直接输出 '%' 和该字符
-                    if (remain > 1) {
-                        *curr++ = '%';
-                        remain--;
-                    }
-                    len++;
-                    if (remain > 1) {
-                        *curr++ = ch;
-                        remain--;
-                    }
-                    len++;
-                    break;
-            }
-            // 累加长度已在各分支中处理，这里无需额外操作
         }
     }
 
@@ -223,6 +265,6 @@ int kernel_vsnprintf(char *buffer, uint16_t size, const char *fmt, va_list args)
     }
 
     // 返回实际应写入的字符数（不包括结尾 '\0'）
-    return (curr - buffer) + (size == 0 ? 0 : 1); // 需要计算实际长度，更精确的做法是全程计数
-    // 注意：上面返回的长度需要更精确的计算，这里简化，可改为维护 total_len 变量
+    // 注意：这里简化处理，如需精确计数应维护 total_len
+    return (curr - buffer) + (size == 0 ? 0 : 1);
 }
