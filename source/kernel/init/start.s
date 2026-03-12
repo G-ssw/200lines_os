@@ -96,3 +96,24 @@ exception_handler virtual_exception, 20, 0
 
 // 硬件中断
 exception_handler timer, 32, 0
+
+.text
+.global simple_task_switch
+
+simple_task_switch:
+	movl 4(%esp), %eax // 获取当前任务的 TSS 选择子
+	movl 8(%esp), %edx // 获取目标任务的 TSS 选择子
+
+	push %ebp
+	push %ebx
+	push %esi
+	push %edi
+
+	mov %esp, (%eax)
+	mov %edx, %esp
+
+	pop %edi
+	pop %esi
+	pop %ebx
+	pop %ebp
+	ret

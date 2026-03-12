@@ -33,11 +33,23 @@ static int tss_init(task_t *task, uint32_t entry_point, uint32_t stack_top) {
 
 int task_create(task_t *task, uint32_t entry_point, uint32_t stack_top) {
     ASSERT(task);
-    return tss_init(task, entry_point, stack_top);
+    // 手动构造初始栈帧，模拟任务切换时 CPU 自动压入的寄存器
+    uint32_t * pesp = (uint32_t *)stack_top;
+    if (pesp) {
+        *(--pesp) = entry_point;
+        *(--pesp) = 0;
+        *(--pesp) = 0;
+        *(--pesp) = 0;
+        *(--pesp) = 0;
+        task->stack = pesp;
+    }
+    //tss_init(task, entry_point, stack_top)
+    return 1;
 }
 
 void task_switch_from_to(task_t *from, task_t *to) {
     ASSERT(from);
     ASSERT(to);
-    switch_to_tss(to->tss_sel); // 使用保存的 TSS 选择子并切换
+    //switch_to_tss(to->tss_sel); // 使用保存的 TSS 选择子并切换
+    simple_task_switch(&from->stack, to->stack); //手动保存和恢复 TSS 寄存器，模拟任务切换
 }
