@@ -59,6 +59,20 @@ void init_gdt(void){
 
 }
 
+int gdt_alloc_desc(void){
+    for(int i = 1; i < GDT_TABLE_SIZE; i++){
+        if((gdt_table[i].attr & SEG_P_PRESENT) == 0){
+            return i * sizeof(segment_desc_t);
+        }
+    }
+    return -1; // 没有可用的描述符
+}
+
+void switch_to_tss(uint32_t selector){
+    far_jump(selector, 0); // 使用 ljmpl 切换到 TSS 描述符
+    //write_tr(selector); // 直接使用 ltr 指令加载 TSS 描述符
+}
+
 void irq_install(int irq_num, irq_handler_t handler) {
     if (irq_num < 0 || irq_num >= IDT_TABLE_SIZE) {
         return; // 无效的中断号

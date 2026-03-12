@@ -6,7 +6,7 @@
 
 #define SEG_G				(1 << 3)
 #define SEG_D				(1 << 2)
-#define SEG_P_PRESENT	    (1 << 7)
+#define SEG_P_PRESENT	    (1 << 7) 
 #define SEG_DPL0			(0 << 5)
 #define SEG_DPL3			(3 << 5)
 #define SEG_S_SYSTEM		(0 << 4)
@@ -15,11 +15,15 @@
 #define SEG_TYPE_DATA		(0 << 3)
 #define SEG_TYPE_RW			(1 << 1)
 
+#define SEG_TYPE_TSS        (9 << 0)		// 32位可用TSS描述符类型
 
 #define GATE_TYPE_IDT		(0xE << 8)		// 中断32位门描述符
 #define GATE_P_PRESENT		(1 << 15)		// 是否存在
 #define GATE_DPL0			(0 << 13)		// 特权级0，最高特权级
 #define GATE_DPL3			(3 << 13)		// 特权级3，最低权限
+
+#define EFLAGS_IF           (1 << 9)
+#define EFLAGS_DEFAULT      (1 << 1)
 
 #pragma pack(1)
 /********** 全局描述符 **********/
@@ -38,6 +42,17 @@ typedef struct _gate_desc_t {
 	uint16_t attr;
 	uint16_t offset31_16;
 }gate_desc_t;
+
+/********** TSS 结构体 **********/
+typedef struct _tss_t {
+    uint32_t pre_link;
+    uint32_t esp0, ss0, esp1, ss1, esp2, ss2;
+    uint32_t cr3;
+    uint32_t eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    uint32_t es, cs, ss, ds, fs, gs;
+    uint32_t ldt;
+    uint32_t iomap;
+}tss_t;
 #pragma pack()
 
 // ---------- 用于构造 16 位 attr 值 ----------
@@ -63,9 +78,11 @@ typedef struct _gate_desc_t {
 void cpu_init(void);
 void segment_desc_set(uint16_t selector, uint32_t base, uint32_t limit, uint8_t type, uint8_t flags);
 void gate_desc_set(uint8_t vector, uint16_t selector_cs, uint32_t offset, uint16_t attr);
+int gdt_alloc_desc(void);
 void irq_install(int irq_num, irq_handler_t handler);
 void irq_enable(int irq_num);
 void irq_disable(int irq_num);
 void irq_global_enable();
 void irq_global_disable();
+void switch_to_tss(uint32_t selector);
 #endif
