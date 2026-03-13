@@ -51,12 +51,17 @@ source/kernel/CMakeFiles/kernel.dir/init/init.c.obj: ../source/kernel/init/init.
   ../source/kernel/include/dev/timer.h \
   ../source/kernel/include/os_cfg.h \
   ../source/kernel/include/tools/log.h \
-  ../source/kernel/include/core/task.h
+  ../source/kernel/include/core/task.h \
+  ../source/kernel/include/tools/list.h
 
 source/kernel/CMakeFiles/kernel.dir/tools/klib.c.obj: ../source/kernel/tools/klib.c \
   ../source/kernel/include/tools/klib.h \
   ../source/comm/types.h \
   C:/x86_64-elf-tools-windows/lib/gcc/x86_64-elf/7.1.0/include/stdarg.h
+
+source/kernel/CMakeFiles/kernel.dir/tools/list.c.obj: ../source/kernel/tools/list.c \
+  ../source/kernel/include/tools/list.h \
+  ../source/comm/types.h
 
 source/kernel/CMakeFiles/kernel.dir/tools/log.c.obj: ../source/kernel/tools/log.c \
   ../source/kernel/include/tools/log.h \
@@ -84,6 +89,8 @@ C:/x86_64-elf-tools-windows/lib/gcc/x86_64-elf/7.1.0/include/stdarg.h:
 
 ../source/kernel/include/tools/klib.h:
 
+../source/kernel/tools/list.c:
+
 ../source/kernel/include/tools/log.h:
 
 ../source/comm/cpu_instr.h:
@@ -101,6 +108,8 @@ C:/x86_64-elf-tools-windows/lib/gcc/x86_64-elf/7.1.0/include/stdarg.h:
 ../source/kernel/init/init.h:
 
 ../source/comm/boot_info.h:
+
+../source/kernel/include/tools/list.h:
 
 ../source/kernel/tools/klib.c:
 

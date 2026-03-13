@@ -12,6 +12,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/kernel.dir/init/start.S.obj"
   "CMakeFiles/kernel.dir/tools/klib.c.obj"
   "CMakeFiles/kernel.dir/tools/klib.c.obj.d"
+  "CMakeFiles/kernel.dir/tools/list.c.obj"
+  "CMakeFiles/kernel.dir/tools/list.c.obj.d"
   "CMakeFiles/kernel.dir/tools/log.c.obj"
   "CMakeFiles/kernel.dir/tools/log.c.obj.d"
   "kernel.exe"

@@ -31,6 +31,11 @@
 },
 {
   "directory": "D:/Git/diy_x86Linux/build/source/kernel",
+  "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_C.rsp -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -g -o CMakeFiles/kernel.dir/core/task.c.obj -c D:/Git/diy_x86Linux/source/kernel/core/task.c",
+  "file": "D:/Git/diy_x86Linux/source/kernel/core/task.c"
+},
+{
+  "directory": "D:/Git/diy_x86Linux/build/source/kernel",
   "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_C.rsp -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -g -o CMakeFiles/kernel.dir/cpu/cpu.c.obj -c D:/Git/diy_x86Linux/source/kernel/cpu/cpu.c",
   "file": "D:/Git/diy_x86Linux/source/kernel/cpu/cpu.c"
 },
@@ -53,6 +58,11 @@
   "directory": "D:/Git/diy_x86Linux/build/source/kernel",
   "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_C.rsp -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -g -o CMakeFiles/kernel.dir/tools/klib.c.obj -c D:/Git/diy_x86Linux/source/kernel/tools/klib.c",
   "file": "D:/Git/diy_x86Linux/source/kernel/tools/klib.c"
+},
+{
+  "directory": "D:/Git/diy_x86Linux/build/source/kernel",
+  "command": "C:/x86_64-elf-tools-windows/bin/x86_64-elf-gcc.exe  @CMakeFiles/kernel.dir/includes_C.rsp -g -c -O0 -m32 -fno-pie -fno-stack-protector -fno-asynchronous-unwind-tables -g -o CMakeFiles/kernel.dir/tools/list.c.obj -c D:/Git/diy_x86Linux/source/kernel/tools/list.c",
+  "file": "D:/Git/diy_x86Linux/source/kernel/tools/list.c"
 },
 {
   "directory": "D:/Git/diy_x86Linux/build/source/kernel",

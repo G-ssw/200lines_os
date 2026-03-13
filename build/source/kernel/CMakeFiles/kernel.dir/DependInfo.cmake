@@ -26,6 +26,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "D:/Git/diy_x86Linux/source/kernel/dev/timer.c" "source/kernel/CMakeFiles/kernel.dir/dev/timer.c.obj" "gcc" "source/kernel/CMakeFiles/kernel.dir/dev/timer.c.obj.d"
   "D:/Git/diy_x86Linux/source/kernel/init/init.c" "source/kernel/CMakeFiles/kernel.dir/init/init.c.obj" "gcc" "source/kernel/CMakeFiles/kernel.dir/init/init.c.obj.d"
   "D:/Git/diy_x86Linux/source/kernel/tools/klib.c" "source/kernel/CMakeFiles/kernel.dir/tools/klib.c.obj" "gcc" "source/kernel/CMakeFiles/kernel.dir/tools/klib.c.obj.d"
+  "D:/Git/diy_x86Linux/source/kernel/tools/list.c" "source/kernel/CMakeFiles/kernel.dir/tools/list.c.obj" "gcc" "source/kernel/CMakeFiles/kernel.dir/tools/list.c.obj.d"
   "D:/Git/diy_x86Linux/source/kernel/tools/log.c" "source/kernel/CMakeFiles/kernel.dir/tools/log.c.obj" "gcc" "source/kernel/CMakeFiles/kernel.dir/tools/log.c.obj.d"
   )
 
