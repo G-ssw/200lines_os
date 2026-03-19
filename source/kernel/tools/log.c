@@ -1,5 +1,6 @@
 #include "tools/log.h"
 #include "os_cfg.h"
+#include "cpu/irq.h"
 #include "comm/cpu_instr.h"
 #include "tools/klib.h"
 
@@ -16,6 +17,7 @@ void log_init(void) {
 }
 
 void log_printf(const char *format, ...) {
+    
     // 实现一个简单的日志打印函数，支持格式化输出
     char buffer[128];
     va_list args; 
@@ -26,6 +28,7 @@ void log_printf(const char *format, ...) {
     kernel_vsnprintf(buffer, sizeof(buffer), format, args); // 格式化输出到缓冲区
     va_end(args); // 结束可变参数处理
     
+    uint32_t eflags = irq_enter_protection();
     const char *p = buffer;
     while(*p != '\0') {
         // 处理格式化字符串
@@ -35,7 +38,7 @@ void log_printf(const char *format, ...) {
     }
     outb(COM1_PORT, '\r'); // 发送回车符
     outb(COM1_PORT, '\n'); // 发送换行符
-
+    irq_exit_protection(eflags);
 }
 
 void panic(const char *file, int line, const char *func, const char *cond) {

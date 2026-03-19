@@ -27,8 +27,8 @@ static inline void ListNode_init(ListNode* node, void* data) {
 }
 
 static inline void List_init(List* list) {
-    list->head = NULL;
-    list->tail = NULL;
+    list->head = (ListNode*)0;
+    list->tail = (ListNode*)0;
     list->size = 0;
 }
 

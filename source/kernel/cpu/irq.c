@@ -104,4 +104,15 @@ void do_handler_virtual_exception(exception_frame_t * frame) {
 	do_default_handler(frame, "Virtualization Exception.");
 }
 
+uint32_t irq_enter_protection(void){
+	uint32_t eflags = read_elfags();
+	cli(); // 进入临界区，禁止中断
+	return eflags; // 返回之前的 EFLAGS 状态
+}
+
+void irq_exit_protection(uint32_t eflags){
+	write_eflags(eflags); // 恢复之前的 EFLAGS 状态，可能会重新启用中断
+}
+
+
 

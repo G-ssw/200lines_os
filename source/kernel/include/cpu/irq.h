@@ -83,6 +83,8 @@ void exception_handler_virtual_exception (void);
 
 void exception_handler_timer (void);
 
+uint32_t irq_enter_protection(void);
+void irq_exit_protection(uint32_t prev_eflags);
 
 
 #endif

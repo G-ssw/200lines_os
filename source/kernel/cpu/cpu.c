@@ -2,6 +2,7 @@
 #include "os_cfg.h"
 #include "comm/cpu_instr.h"
 #include "dev/timer.h"
+#include "core/task.h"
 
 static segment_desc_t gdt_table[GDT_TABLE_SIZE]; // 全局描述符表
 static gate_desc_t idt_table[IDT_TABLE_SIZE]; // 中断描述符表
@@ -60,11 +61,13 @@ void init_gdt(void){
 }
 
 int gdt_alloc_desc(void){
+    uint32_t state = irq_enter_protection();
     for(int i = 1; i < GDT_TABLE_SIZE; i++){
         if((gdt_table[i].attr & SEG_P_PRESENT) == 0){
             return i * sizeof(segment_desc_t);
         }
     }
+    irq_exit_protection(state);
     return -1; // 没有可用的描述符
 }
 
@@ -188,4 +191,5 @@ void cpu_init(void) {
     init_gdt();
     irq_init();
     timer_init();
+    task_manager_init();
 } 

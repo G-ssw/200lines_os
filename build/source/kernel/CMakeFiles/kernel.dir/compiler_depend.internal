@@ -7,6 +7,7 @@ source/kernel/CMakeFiles/kernel.dir/core/task.c.obj
  D:/Git/diy_x86Linux/source/comm/types.h
  D:/Git/diy_x86Linux/source/kernel/include/cpu/cpu.h
  D:/Git/diy_x86Linux/source/kernel/include/cpu/irq.h
+ D:/Git/diy_x86Linux/source/kernel/include/tools/list.h
  D:/Git/diy_x86Linux/source/kernel/include/tools/klib.h
  C:/x86_64-elf-tools-windows/lib/gcc/x86_64-elf/7.1.0/include/stdarg.h
  D:/Git/diy_x86Linux/source/kernel/include/tools/log.h
@@ -23,6 +24,8 @@ source/kernel/CMakeFiles/kernel.dir/cpu/cpu.c.obj
  D:/Git/diy_x86Linux/source/comm/cpu_instr.h
  D:/Git/diy_x86Linux/source/comm/types.h
  D:/Git/diy_x86Linux/source/kernel/include/dev/timer.h
+ D:/Git/diy_x86Linux/source/kernel/include/core/task.h
+ D:/Git/diy_x86Linux/source/kernel/include/tools/list.h
 
 source/kernel/CMakeFiles/kernel.dir/cpu/irq.c.obj
  D:/Git/diy_x86Linux/source/kernel/cpu/irq.c
@@ -43,6 +46,8 @@ source/kernel/CMakeFiles/kernel.dir/dev/timer.c.obj
  D:/Git/diy_x86Linux/source/comm/cpu_instr.h
  D:/Git/diy_x86Linux/source/comm/types.h
  D:/Git/diy_x86Linux/source/kernel/include/os_cfg.h
+ D:/Git/diy_x86Linux/source/kernel/include/core/task.h
+ D:/Git/diy_x86Linux/source/kernel/include/tools/list.h
 
 source/kernel/CMakeFiles/kernel.dir/init/init.c.obj
  D:/Git/diy_x86Linux/source/kernel/init/init.c
@@ -74,9 +79,10 @@ source/kernel/CMakeFiles/kernel.dir/tools/log.c.obj
  D:/Git/diy_x86Linux/source/kernel/tools/log.c
  D:/Git/diy_x86Linux/source/kernel/include/tools/log.h
  D:/Git/diy_x86Linux/source/kernel/include/os_cfg.h
+ D:/Git/diy_x86Linux/source/kernel/include/cpu/irq.h
+ D:/Git/diy_x86Linux/source/comm/types.h
  D:/Git/diy_x86Linux/source/comm/cpu_instr.h
  D:/Git/diy_x86Linux/source/comm/types.h
  D:/Git/diy_x86Linux/source/kernel/include/tools/klib.h
- D:/Git/diy_x86Linux/source/comm/types.h
  C:/x86_64-elf-tools-windows/lib/gcc/x86_64-elf/7.1.0/include/stdarg.h
 

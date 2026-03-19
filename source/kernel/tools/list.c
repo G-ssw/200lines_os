@@ -1,11 +1,12 @@
 #include "tools/list.h"
 
 void List_insert_head(List* list, ListNode* node) {
+    node->prev = (ListNode*)0;
+    node->next = list->head;
     if (List_isEmpty(list)) {
         list->head = node;
         list->tail = node;
     } else {
-        node->next = list->head;
         list->head->prev = node;
         list->head = node;
     }
@@ -13,11 +14,12 @@ void List_insert_head(List* list, ListNode* node) {
 }
 
 void List_insert_tail(List* list, ListNode* node) {
+    node->prev = list->tail;
+    node->next = (ListNode*)0;
     if (List_isEmpty(list)) {
         list->head = node;
         list->tail = node;
     } else {
-        node->prev = list->tail;
         list->tail->next = node;
         list->tail = node;
     }
@@ -61,7 +63,7 @@ ListNode* List_remove_tail(List* list){
 }
 
 ListNode* List_remove_node(List* list, ListNode* node){
-    if(list == NULL || List_isEmpty(list) || node == NULL){
+    if(List_isEmpty(list) || node == NULL){
         return NULL;
     }
     if(node == list->head){

@@ -1,4 +1,5 @@
 #include "dev/timer.h"
+#include "core/task.h"
 
 static uint32_t sys_tick;
 
@@ -17,6 +18,9 @@ void do_handler_timer (exception_frame_t *frame) {
     sys_tick++;
     //先发 EOI
     timer_eoi(IRQ0_TIMER);
+
+    task_timeslice_tick(); // 处理任务时间片计数和调度
+    
 }
 
 static void init_pit (void){

@@ -22,9 +22,9 @@ uint32_t init_task_stack[1024]; // 为 init 任务分配一个栈
 void init_task_entry() {
     int count = 0;
     for(;;){
-        log_printf("Init task has been running for %d seconds...", count);
-        task_switch_from_to(&init_task, &first_task);
-        count++;
+        log_printf("Init task has been running for %d seconds...", count++);
+        //task_yield(); // 主动放弃 CPU，切换到其他就绪的任务
+        sys_sleep(1000);
     }
 }
 
@@ -73,21 +73,23 @@ void list_test() {
 }
 
 void init_main(){
-    //irq_global_enable(); // 使能时钟中断
-    list_test();
+    
+    //list_test();
     log_printf("Kernel is running....");
     log_printf("Version: %s, name: %s", OS_VERSION, "tiny x86 os");
     log_printf("%d %d %x %c", -123, 123456, 0x12345, 'a');
 
-    // task_create(&init_task, (uint32_t)init_task_entry, (uint32_t)&init_task_stack[1023]); // 创建 init 任务
-    // task_create(&first_task, 0, 0); // 创建第一个用户任务
-    // write_tr(first_task.tss_sel); // 直接使用 ltr 指令加载 TSS 描述符
-    // //int a = 3;
-    // //ASSERT(a < 2); // 触发断言测试
-    // //int a = 3 / 0; // 故意制造一个除零错误，测试异常处理
-    // int count = 0;
-    // for (;;) { 
-    //     log_printf("first task: %d", count++);
-    //     task_switch_from_to(&first_task, &init_task);
-    // }
+    task_create(&init_task, "Init Task", (uint32_t)init_task_entry, (uint32_t)&init_task_stack[1023]); // 创建 init 任务
+    first_task_init(); // 初始化第一个用户任务
+
+    //int a = 3;
+    //ASSERT(a < 2); // 触发断言测试
+    //int a = 3 / 0; // 故意制造一个除零错误，测试异常处理
+    int count = 0;
+    irq_global_enable(); // 使能时钟中断
+    for (;;) { 
+        log_printf("first task: %d", count++);
+        sys_sleep(1000);
+        //task_yield(); // 主动放弃 CPU，切换到其他就绪的任务
+    }
 }

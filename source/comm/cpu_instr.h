@@ -88,4 +88,14 @@ static inline void hlt(void) {
     __asm__ __volatile__("hlt");
 }
 
+static inline uint32_t read_elfags(void){
+	uint32_t eflags;
+	__asm__ __volatile__("pushfl \n\t popl %%eax":"=a"(eflags));
+	return eflags;
+}
+
+static inline void write_eflags(uint32_t eflags){
+	__asm__ __volatile__("pushl %%eax \n\t popfl" : :"a"(eflags));
+}
+
 #endif
